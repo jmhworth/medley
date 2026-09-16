@@ -1,0 +1,9 @@
+# Scaffolded by Daedalus personal Supabase registration.
+# Daedalus supplies the launch-root SUPABASE_PROJECT_REF temporarily at launch.
+# Phase 1 writes files only; Activate / orchestration owns `supabase db push`.
+project_id = "YOUR_SHARED_SUPABASE_PROJECT_REF"
+
+[api]
+# Exposed schemas for a shared project are allow-listed in the Supabase
+# Dashboard (Data API / PostgREST). Manually add this project's schema
+# after the CREATE SCHEMA migration is applied remotely.

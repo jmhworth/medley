@@ -32,3 +32,16 @@ There are 4 stages we adhere to in development:
 2. TESTING: Incremental hardening. Introduce structured unit tests, catch-blocks, and condition validations.
 3. PRODUCTION-READY: Enterprise optimization. Implement full validation layers, robust documentation strings, edge-case coverage, and clean structural syntax (dataclasses, slots, performance optimizations).
 4. DEBUGGING: Deep diagnostics. Strip defensive abstractions. Maximize structured event logging, granular print statements, and cross-feature execution tracking.
+
+## Personal Supabase Schema
+
+This project uses a dedicated Postgres schema `medley` on the operator's shared personal Supabase database. Do **not** use the default `public` schema for application tables or migrations.
+
+- Read the schema name from `SUPABASE_SCHEMA` in the project `.env` (expected value: `medley`).
+- The launch-root `.env` is the canonical shared source for the project ref, URL, keys, and database access settings; Daedalus synchronizes the ignored project `.env` at launch.
+- Qualify SQL, migrations, RLS policies, and client/API configuration for `medley`.
+- Never assume PostgREST or Supabase clients default to `public` for this app.
+- Auth is shared across apps on this Supabase project; reuse the existing auth setup.
+- Agents must not run `supabase db push`; orchestration owns remote migration apply after verification when `supabase/migrations/` changes, and Activate owns the first apply.
+- File scaffolding alone is not ecosystem-ready; the operator must Activate via Daedalus (from the Ctrl+K Command Menu) so the software layer commits the scaffold and pushes migrations.
+- After the first remote apply, the operator must allow-list this schema in the Supabase Dashboard Data API / PostgREST exposed-schemas settings.

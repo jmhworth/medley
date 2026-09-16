@@ -111,7 +111,7 @@ Adhere strictly to the execution style mandated by the active feature file's Dev
 This project uses a dedicated Postgres schema `medley` on the operator's shared personal Supabase database. Do **not** use the default `public` schema for application tables or migrations.
 
 - Read the schema name from `SUPABASE_SCHEMA` in the project `.env` (expected value: `medley`).
-- The launch-root `.env` is the canonical shared source for the project ref, URL, keys, and database access settings; Daedalus synchronizes the ignored project `.env` at launch.
+- The launch-root `.env` is the canonical shared source for `SUPABASE_URL`, publishable/secret API keys (legacy anon/service_role aliases still work), and one database access setting (`SUPABASE_DB_URL` or `SUPABASE_ACCESS_TOKEN`); the project ref is optional when the URL is `https://<ref>.supabase.co`. Daedalus synchronizes the ignored project `.env` at launch.
 - Qualify SQL, migrations, RLS policies, and client/API configuration for `medley`.
 - Never assume PostgREST or Supabase clients default to `public` for this app.
 - Auth is shared across apps on this Supabase project; reuse the existing auth setup.

@@ -1,5 +1,5 @@
 # Scaffolded by Daedalus personal Supabase registration.
-# Daedalus supplies the launch-root SUPABASE_PROJECT_REF temporarily at launch.
+# Daedalus supplies the launch-root project ref temporarily at Activate/push (from SUPABASE_PROJECT_REF or derived from SUPABASE_URL).
 # Phase 1 writes files only; Activate / orchestration owns `supabase db push`.
 project_id = "YOUR_SHARED_SUPABASE_PROJECT_REF"
 

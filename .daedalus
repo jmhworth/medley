@@ -2,3 +2,6 @@
 registered = true
 schema = "medley"
 activated = false
+last_activate_status = "blocked_supabase"
+last_activate_error = "Launch environment is missing required Supabase setting(s): SUPABASE_URL."
+

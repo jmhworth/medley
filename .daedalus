@@ -1,7 +1,6 @@
 [personal_supabase]
 registered = true
 schema = "medley"
-activated = false
-last_activate_status = "blocked_supabase"
-last_activate_error = "IPv6 is not supported on your current network: dial tcp [2600:1f18:5608:e005::1ecb]:5432: connect: no route to host Run supabase link --project-ref jynmzzpdzvpfebupwkqc to setup IPv4 connection."
+activated = true
+last_activate_status = "success"
 

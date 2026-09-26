@@ -3,5 +3,5 @@ registered = true
 schema = "medley"
 activated = false
 last_activate_status = "blocked_supabase"
-last_activate_error = "DNS could not resolve database host db.jynmzzpdzvpfebupwkqc.supabase.co:5432 ([Errno 8] nodename nor servname provided, or not known). Check SUPABASE_DB_URL against the project's Connect settings; if the host matches, check this machine's …"
+last_activate_error = "[Errno 2] No such file or directory: 'supabase'"
 

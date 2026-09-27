@@ -1,7 +1,7 @@
 # Supabase Auth
 
 ## Summary
-Hosted Supabase Auth for Medley email/password login and signup. App Router cookie sessions via `@supabase/ssr`; middleware refreshes the session and hard-gates the app so only `/login`, `/signup`, and static assets are public. Song JSON storage stays untouched — this feature only scaffolds identity for later user-scoped data.
+Hosted Supabase Auth for Medley email/password login and signup. App Router cookie sessions via `@supabase/ssr`; middleware refreshes the session and hard-gates the app so only `/login`, `/signup`, and static assets are public. Supabase clients select the project schema from `SUPABASE_SCHEMA` (default `medley`) while reusing the shared auth session.
 
 ## Key Points
 - **Sign-in**: Email + password only. Confirm email must be disabled in the Supabase Auth dashboard so signup returns a session immediately (no confirm callback route).
@@ -13,8 +13,8 @@ Hosted Supabase Auth for Medley email/password login and signup. App Router cook
 ## Relevant Files
 - `src/lib/supabase/env.ts`: Public env reader + `isSupabaseConfigured`.
 - `src/lib/supabase/params.ts`: Reads `post_login_redirect` from the parameter file.
-- `src/lib/supabase/client.ts`: Browser anon client.
-- `src/lib/supabase/server.ts`: Server client with cookie read/write.
+- `src/lib/supabase/client.ts`: Browser anon client configured for the project schema.
+- `src/lib/supabase/server.ts`: Cookie-authenticated server client configured for the project schema.
 - `src/lib/supabase/middleware.ts`: Session refresh + hard-gate redirect helper.
 - `src/lib/supabase/auth.ts`: `getMedleyUser` session helper.
 - `src/middleware.ts`: Next.js middleware entry (refresh + gate).
@@ -24,7 +24,7 @@ Hosted Supabase Auth for Medley email/password login and signup. App Router cook
 - `src/app/page.tsx`: Home header Medley session / logout links (Spotify UI unchanged in role).
 - `parameter_files/supabase_auth.toml`: Non-secret redirects/toggles.
 - `.env.example` / `README.md`: Hosted project setup + Confirm-email-off note.
-- `feature_files/song_database.md`: Future consumer of Medley user identity; not migrated here.
+- `feature_files/song_database.md`: User-owned song data consumer of the shared auth session.
 
 ## Dev Mode
 HACKING
@@ -32,3 +32,4 @@ HACKING
 ## State Log
 - 2026-09-07: Initialized feature file for hosted Supabase email/password auth scaffolding.
 - 2026-09-07: Shipped hosted Supabase email/password clients, hard-gate middleware, login/signup/logout UI, and env docs; left JSON song DB unchanged.
+- 2026-09-26: Configured cookie, middleware, and browser clients to use the project Supabase schema while retaining shared user authentication.

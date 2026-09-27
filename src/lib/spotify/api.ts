@@ -13,6 +13,12 @@ export type SpotifyTrack = {
   artists: string;
 };
 
+export type RecentlyPlayedTrack = {
+  name: string;
+  artists: string;
+  playedAt: string;
+};
+
 async function spotifyGet(url: string) {
   const token = await getAccessToken();
   const res = await fetch(url, {
@@ -60,6 +66,38 @@ export async function listPlaylistTracks(playlistId: string) {
         artists: (track.artists ?? []).map((a: { name: string }) => a.name).join(", "),
       });
     }
+    url = data.next;
+  }
+
+  return tracks;
+}
+
+export async function listRecentlyPlayed(start: string, end: string) {
+  const token = await getAccessToken();
+  const tracks: RecentlyPlayedTrack[] = [];
+  let url: string | null =
+    `https://api.spotify.com/v1/me/player/recently-played?limit=50&after=${new Date(start).getTime() - 1}`;
+
+  while (url) {
+    const res = await fetch(url, {
+      headers: { Authorization: `Bearer ${token}` },
+      cache: "no-store",
+    });
+    if (!res.ok) throw new Error(`Spotify recently played request failed: ${res.status}`);
+    const data = await res.json();
+
+    for (const item of data.items ?? []) {
+      const track = item.track;
+      if (!track || track.type !== "track") continue;
+      if (item.played_at < start || item.played_at >= end) continue;
+
+      tracks.push({
+        name: track.name,
+        artists: (track.artists ?? []).map((artist: { name: string }) => artist.name).join(", "),
+        playedAt: item.played_at,
+      });
+    }
+
     url = data.next;
   }
 

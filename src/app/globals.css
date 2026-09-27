@@ -223,6 +223,122 @@ h1 {
   flex-direction: column;
 }
 
+.collection-panel {
+  margin: 0 0 2.5rem;
+  padding: 1.25rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: rgba(255, 255, 255, 0.58);
+  animation: rise 480ms ease-out both;
+}
+
+.collection-heading-row,
+.collection-actions {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8rem;
+}
+
+.collection-heading-row h2 {
+  margin: 0;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 1.35rem;
+  letter-spacing: -0.03em;
+}
+
+.collection-copy {
+  margin: 0.5rem 0 0;
+  color: var(--muted);
+  font-size: 0.92rem;
+  line-height: 1.5;
+}
+
+.collection-start,
+.collection-action {
+  margin-top: 0;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.collection-start:disabled,
+.collection-action:disabled {
+  cursor: wait;
+  opacity: 0.65;
+}
+
+.song-review {
+  margin-top: 1.25rem;
+  padding-top: 1.1rem;
+  border-top: 1px solid var(--line);
+}
+
+.song-review h3 {
+  margin: 0.2rem 0 0;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 1.25rem;
+}
+
+.collection-progress {
+  margin: 0;
+  color: var(--muted);
+  font-size: 0.82rem;
+  font-variant-numeric: tabular-nums;
+}
+
+.attribute-section {
+  margin-top: 1rem;
+}
+
+.attribute-section h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.92rem;
+}
+
+.attribute-section ul {
+  margin: 0;
+  padding-left: 1.25rem;
+  color: var(--ink-soft);
+  line-height: 1.55;
+}
+
+.collection-label {
+  display: flex;
+  flex-direction: column;
+  gap: 0.4rem;
+  color: var(--muted);
+  font-size: 0.84rem;
+}
+
+.collection-textarea {
+  width: 100%;
+  min-height: 5rem;
+  padding: 0.7rem 0.8rem;
+  border: 1px solid var(--line);
+  border-radius: 0.5rem;
+  background: rgba(255, 255, 255, 0.75);
+  color: var(--ink);
+  font: inherit;
+  resize: vertical;
+}
+
+.collection-textarea:focus {
+  outline: 2px solid rgba(10, 107, 99, 0.35);
+  outline-offset: 1px;
+}
+
+.collection-actions {
+  justify-content: flex-start;
+  margin-top: 1.15rem;
+}
+
+.collection-error {
+  margin: 0.9rem 0 0;
+  color: #8a2f2f;
+  font-size: 0.9rem;
+}
+
 .playlist-row {
   border-bottom: 1px solid var(--line);
   animation: rise 480ms ease-out both;
@@ -346,5 +462,14 @@ h1 {
 
   .song-title {
     font-size: 0.95rem;
+  }
+
+  .collection-panel {
+    padding: 1rem;
+  }
+
+  .collection-heading-row {
+    align-items: flex-start;
+    flex-direction: column;
   }
 }

@@ -1,20 +1,6 @@
 export type {
   Song,
-  SongAttributeUpdate,
-  SongDatabase,
-  SongFindFilter,
-  SongInput,
+  SongKey,
 } from "./types";
 
-export { loadSongDatabaseParams } from "./params";
-
-export {
-  addSongPlaylists,
-  findSongs,
-  getSongById,
-  listSongs,
-  loadDatabase,
-  populateSongs,
-  saveDatabase,
-  updateSongAttributes,
-} from "./db";
+export { getSongsForKeys, saveSong } from "./db";

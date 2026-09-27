@@ -1,2 +1,1 @@
-# Path to the JSON song store (relative to the project root)
-database_path = "data/songs.json"
+# Song attributes are stored in Supabase; no feature-specific tuning values yet.

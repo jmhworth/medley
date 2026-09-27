@@ -3,6 +3,7 @@ import { PlaylistBrowser } from "./playlist-browser";
 import { getMedleyUser } from "@/lib/supabase/auth";
 import { listPlaylists } from "@/lib/spotify/api";
 import { hasSpotifySession } from "@/lib/spotify/auth";
+import { SongCollection } from "./song-collection";
 
 type HomeProps = {
   searchParams: Promise<{
@@ -76,6 +77,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </Link>
       </header>
 
+      <SongCollection />
       <PlaylistBrowser playlists={playlists} />
     </main>
   );

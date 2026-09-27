@@ -2,6 +2,3 @@
 registered = true
 schema = "medley"
 activated = false
-last_activate_status = "blocked_supabase"
-last_activate_error = "Remote schema reset requires psql on PATH. Install the PostgreSQL client, then retry Activate."
-

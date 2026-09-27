@@ -110,11 +110,13 @@ Adhere strictly to the execution style mandated by the active feature file's Dev
 
 This project uses a dedicated Postgres schema `medley` on the operator's shared personal Supabase database. Do **not** use the default `public` schema for application tables or migrations.
 
-- Read the schema name from `SUPABASE_SCHEMA` in the project `.env` (expected value: `medley`).
-- The launch-root `.env` is the canonical shared source for `SUPABASE_URL`, publishable/secret API keys (legacy anon/service_role aliases still work), and one database access setting (`SUPABASE_DB_URL` or `SUPABASE_ACCESS_TOKEN`); the project ref is optional when the URL is `https://<ref>.supabase.co`. Daedalus synchronizes the ignored project `.env` at launch.
+- Schema name is `medley` (see `SUPABASE_SCHEMA` in `.env.example` and the `[personal_supabase]` marker in `.daedalus`).
+- This project's ignored `.env` is the canonical source for `SUPABASE_URL`, publishable/secret API keys (legacy anon/service_role aliases still work), and one database access setting (`SUPABASE_DB_URL`, `SUPABASE_DB_URL_IPV4`, `SUPABASE_DB_URL_IPV6`, or `SUPABASE_ACCESS_TOKEN`). When multiple database URLs are set, Activate probes the IPv4 URL, then IPv6, then the default URL and passes the reachable URL to migration push. `SUPABASE_URL` remains the independent PostgREST/API endpoint. Project ref is optional when the URL is `https://<ref>.supabase.co`. Operators set those values manually; Daedalus never writes credentials into project `.env` files.
 - Qualify SQL, migrations, RLS policies, and client/API configuration for `medley`.
+- With supabase-js, select this schema explicitly (for example, `supabase.schema('medley').from('table_name')`) or set the client's default `db.schema` to `medley`. Do not silently fall back to `public`.
 - Never assume PostgREST or Supabase clients default to `public` for this app.
 - Auth is shared across apps on this Supabase project; reuse the existing auth setup.
 - Agents must not run `supabase db push`; orchestration owns remote migration apply after verification when `supabase/migrations/` changes, and Activate owns the first apply.
 - File scaffolding alone is not ecosystem-ready; the operator must Activate via Daedalus (from the Ctrl+K Command Menu) so the software layer commits the scaffold and pushes migrations.
-- After the first remote apply, the operator must allow-list this schema in the Supabase Dashboard Data API / PostgREST exposed-schemas settings.
+- The generated `supabase/config.toml` exposes `medley` for the local Supabase CLI stack. This local setting does not change the hosted project's PostgREST configuration. After Activate applies the schema, add it to Supabase Dashboard Project Settings > Data API > Exposed schemas, preserving the existing entries.
+- If a hosted request fails with `PGRST106` / `Invalid schema: medley`, PostgREST does not currently expose the requested schema. Check the hosted Exposed schemas list first. If the schema is already listed but the error remains, check whether the database role `authenticator` has a stale `pgrst.db_schemas` role setting; only when confirmed, reset that override with `ALTER ROLE authenticator RESET pgrst.db_schemas;` so the Dashboard configuration can take effect.

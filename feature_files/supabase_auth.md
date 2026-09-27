@@ -6,8 +6,8 @@ Hosted Supabase Auth for Medley email/password login and signup. App Router cook
 ## Key Points
 - **Sign-in**: Email + password only. Confirm email must be disabled in the Supabase Auth dashboard so signup returns a session immediately (no confirm callback route).
 - **Hard gate**: Unauthenticated requests redirect to `/login`. Spotify connect/browse sit behind Medley login; Spotify cookies stay a separate namespace.
-- **Secrets**: `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY` live in `.env.local` only; never in parameter files. No service-role key in the client app.
-- **Missing config**: When URL/anon key are absent, login/signup show a `missing_config` notice (same spirit as Spotify); middleware still treats the user as logged out.
+- **Credentials**: The server reads `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY`; login/signup pages pass these public connection values to the browser auth form. No secret/service-role key enters the client app or parameter files.
+- **Missing config**: When URL/publishable key are absent, login/signup show a `missing_config` notice (same spirit as Spotify); middleware still treats the user as logged out.
 - **Redirect**: After login/signup, send the user to `post_login_redirect` from the parameter file (default `/`).
 
 ## Relevant Files
@@ -32,3 +32,4 @@ HACKING
 ## State Log
 - 2026-09-07: Initialized feature file for hosted Supabase email/password auth scaffolding.
 - 2026-09-07: Shipped hosted Supabase email/password clients, hard-gate middleware, login/signup/logout UI, and env docs; left JSON song DB unchanged.
+- 2026-09-26: Switched Supabase auth to the canonical `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` variables and passed them from server pages to the browser auth form.

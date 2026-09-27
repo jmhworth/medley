@@ -1,11 +1,11 @@
 export function getSupabaseEnv() {
   return {
-    url: process.env.NEXT_PUBLIC_SUPABASE_URL?.trim() ?? "",
-    anonKey: process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY?.trim() ?? "",
+    url: process.env.SUPABASE_URL?.trim() ?? "",
+    publishableKey: process.env.SUPABASE_PUBLISHABLE_KEY?.trim() ?? "",
   };
 }
 
 export function isSupabaseConfigured() {
-  const { url, anonKey } = getSupabaseEnv();
-  return Boolean(url && anonKey);
+  const { url, publishableKey } = getSupabaseEnv();
+  return Boolean(url && publishableKey);
 }

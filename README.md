@@ -8,7 +8,7 @@ Copy `.env.example` to `.env.local`, then set `SPOTIFY_CLIENT_ID` to the Client 
 
 ## Local Supabase auth setup
 
-Create a hosted project in the [Supabase Dashboard](https://supabase.com/dashboard), then copy the Project URL and anon/public key into `.env.local` as `NEXT_PUBLIC_SUPABASE_URL` and `NEXT_PUBLIC_SUPABASE_ANON_KEY`. Under **Authentication → Providers / Email**, turn **Confirm email** off so signup returns a session immediately (no confirmation email callback in this app yet). Restart the Next.js dev server after changing `.env.local`. Medley login is required before Spotify connect or playlist browsing.
+Create a hosted project in the [Supabase Dashboard](https://supabase.com/dashboard), then set its Project URL as `SUPABASE_URL` and its publishable key as `SUPABASE_PUBLISHABLE_KEY` in the canonical launch-root `.env`; Daedalus synchronizes those values to the project's `.env` at launch. Under **Authentication → Providers / Email**, turn **Confirm email** off so signup returns a session immediately (no confirmation email callback in this app yet). Restart the Next.js dev server after changing the environment. Medley login is required before Spotify connect or playlist browsing.
 
 ## Overview
 

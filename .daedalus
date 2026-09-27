@@ -1,0 +1,4 @@
+[personal_supabase]
+registered = true
+schema = "medley"
+activated = false

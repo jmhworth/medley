@@ -1,0 +1,10 @@
+# Scaffolded by Daedalus personal Supabase registration.
+# Daedalus supplies the project ref temporarily at Activate/push (from SUPABASE_PROJECT_REF or derived from SUPABASE_URL).
+# Phase 1 writes files only; Activate / orchestration owns `supabase db push`.
+project_id = "YOUR_SHARED_SUPABASE_PROJECT_REF"
+[api]
+schemas = ["public", "storage", "graphql_public", "medley"]
+extra_search_path = ["public", "extensions", "medley"]
+# The schema above applies to the local Supabase CLI stack. For hosted
+# PostgREST, add the project schema under Dashboard > Project Settings >
+# Data API > Exposed schemas after its CREATE SCHEMA migration is applied.

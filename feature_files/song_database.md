@@ -30,3 +30,4 @@ HACKING
 - 2026-09-05: Initialized feature file for the file-backed song JSON database.
 - 2026-09-05: Shipped Song schema, empty `data/songs.json`, params loader, and load/find/populate/attribute helpers under `src/lib/songs/`.
 - 2026-09-26: Replaced the JSON scaffold with user-owned Supabase song lists, RLS, daily Spotify review queue, save/skip flow, and hyphen-bullet entry.
+- 2026-09-26: Reviewed the collection implementation against the approved plan and confirmed it uses the shared cookie-authenticated Supabase session without applying migrations.

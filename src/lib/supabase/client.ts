@@ -1,7 +1,9 @@
 import { createBrowserClient } from "@supabase/ssr";
-import { getSupabaseEnv } from "./env";
 
-export function createBrowserSupabaseClient() {
-  const { url, anonKey, schema } = getSupabaseEnv();
-  return createBrowserClient(url, anonKey, { db: { schema } });
+export function createBrowserSupabaseClient(
+  url: string,
+  publishableKey: string,
+  schema: string,
+) {
+  return createBrowserClient(url, publishableKey, { db: { schema } });
 }

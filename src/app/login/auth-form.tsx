@@ -9,9 +9,19 @@ type AuthFormProps = {
   mode: "login" | "signup";
   redirectTo: string;
   configured: boolean;
+  supabaseUrl: string;
+  publishableKey: string;
+  schema: string;
 };
 
-export function AuthForm({ mode, redirectTo, configured }: AuthFormProps) {
+export function AuthForm({
+  mode,
+  redirectTo,
+  configured,
+  supabaseUrl,
+  publishableKey,
+  schema,
+}: AuthFormProps) {
   const router = useRouter();
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
@@ -26,7 +36,11 @@ export function AuthForm({ mode, redirectTo, configured }: AuthFormProps) {
       return;
     }
 
-    const supabase = createBrowserSupabaseClient();
+    const supabase = createBrowserSupabaseClient(
+      supabaseUrl,
+      publishableKey,
+      schema,
+    );
 
     if (mode === "login") {
       const { error } = await supabase.auth.signInWithPassword({

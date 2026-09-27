@@ -1,5 +1,5 @@
 import { AuthForm } from "./auth-form";
-import { isSupabaseConfigured } from "@/lib/supabase/env";
+import { getSupabaseEnv, isSupabaseConfigured } from "@/lib/supabase/env";
 import { loadSupabaseAuthParams } from "@/lib/supabase/params";
 
 type LoginProps = {
@@ -10,6 +10,7 @@ type LoginProps = {
 
 export default async function LoginPage({ searchParams }: LoginProps) {
   const configured = isSupabaseConfigured();
+  const supabaseEnv = getSupabaseEnv();
   const { postLoginRedirect } = loadSupabaseAuthParams();
   const { error } = await searchParams;
   const showMissingConfig = !configured || error === "missing_config";
@@ -24,8 +25,8 @@ export default async function LoginPage({ searchParams }: LoginProps) {
         </p>
         {showMissingConfig && (
           <p className="config-notice">
-            Supabase is not configured yet. Add NEXT_PUBLIC_SUPABASE_URL and
-            NEXT_PUBLIC_SUPABASE_ANON_KEY to .env.local, disable Confirm email
+            Supabase is not configured yet. Set SUPABASE_URL and
+            SUPABASE_PUBLISHABLE_KEY, disable Confirm email
             in the Supabase Auth settings, then restart the dev server.
           </p>
         )}
@@ -33,6 +34,9 @@ export default async function LoginPage({ searchParams }: LoginProps) {
           mode="login"
           redirectTo={postLoginRedirect}
           configured={configured}
+          supabaseUrl={supabaseEnv.url}
+          publishableKey={supabaseEnv.publishableKey}
+          schema={supabaseEnv.schema}
         />
       </div>
     </main>

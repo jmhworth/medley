@@ -23,9 +23,9 @@ export async function updateSession(request: NextRequest) {
     return NextResponse.redirect(loginUrl);
   }
 
-  const { url, anonKey, schema } = getSupabaseEnv();
+  const { url, publishableKey, schema } = getSupabaseEnv();
 
-  const supabase = createServerClient(url, anonKey, {
+  const supabase = createServerClient(url, publishableKey, {
     db: { schema },
     cookies: {
       getAll() {

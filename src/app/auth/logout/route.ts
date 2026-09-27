@@ -9,8 +9,8 @@ export async function GET(request: NextRequest) {
     return response;
   }
 
-  const { url, anonKey } = getSupabaseEnv();
-  const supabase = createServerClient(url, anonKey, {
+  const { url, publishableKey } = getSupabaseEnv();
+  const supabase = createServerClient(url, publishableKey, {
     cookies: {
       getAll() {
         return request.cookies.getAll();

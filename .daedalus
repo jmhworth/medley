@@ -2,6 +2,3 @@
 registered = true
 schema = "medley"
 activated = false
-last_activate_status = "blocked_supabase"
-last_activate_error = "Connecting to remote database... Remote migration versions not found in local migrations directory. Make sure your local git repo is up-to-date. If the error persists, try repairing the migration history table: supabase migration repair --…"
-

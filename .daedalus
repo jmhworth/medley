@@ -1,7 +1,6 @@
 [personal_supabase]
 registered = true
 schema = "medley"
-activated = false
-last_activate_status = "blocked_supabase"
-last_activate_error = "psql: error: unexpected spaces found in \"postgres # optional IPv4 Session pooler connection\", use percent-encoded spaces (%20) instead psql: error: unexpected spaces found in \"postgres # optional IPv6 direct connection\", use percent-encode…"
+activated = true
+last_activate_status = "success"
 

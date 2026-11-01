@@ -2,6 +2,6 @@
 registered = true
 schema = "medley"
 activated = false
-last_activate_status = "blocked_git"
-last_activate_error = "Unrelated dirty files block Activate (supabase/config.toml, supabase/migrations/20260101000000_create_personal_schema.sql). Commit or clean them, or keep only personal-Supabase scaffold changes."
+last_activate_status = "blocked_supabase"
+last_activate_error = "Connecting to remote database... Remote migration versions not found in local migrations directory. Make sure your local git repo is up-to-date. If the error persists, try repairing the migration history table: supabase migration repair --…"
 

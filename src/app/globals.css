@@ -1,15 +1,15 @@
 @import "tailwindcss";
 
 :root {
-  --ink: #101820;
-  --ink-soft: #1c2a36;
-  --surface: #f0f4f7;
-  --surface-2: #dde5ec;
-  --muted: #5d6b78;
-  --accent: #0a6b63;
-  --accent-bright: #12a396;
-  --line: rgba(16, 24, 32, 0.1);
-  --glow: rgba(18, 163, 150, 0.16);
+  --ink: #edf4f8;
+  --ink-soft: #d3dfe7;
+  --surface: #0b1117;
+  --surface-2: #151f29;
+  --muted: #9aaab7;
+  --accent: #63d7c5;
+  --accent-bright: #84eadb;
+  --line: rgba(211, 228, 239, 0.14);
+  --glow: rgba(18, 163, 150, 0.18);
   --background: var(--surface);
   --foreground: var(--ink);
 }
@@ -32,8 +32,8 @@ body {
   font-family: var(--font-manrope), sans-serif;
   background:
     radial-gradient(1000px 520px at 0% -5%, var(--glow), transparent 55%),
-    radial-gradient(800px 420px at 100% 5%, rgba(16, 24, 32, 0.06), transparent 50%),
-    linear-gradient(160deg, #f4f7fa 0%, #e8eef3 55%, #dfe7ee 100%);
+    radial-gradient(800px 420px at 100% 5%, rgba(95, 132, 157, 0.12), transparent 50%),
+    linear-gradient(160deg, #101923 0%, #0b1117 55%, #080d12 100%);
 }
 
 a {
@@ -71,7 +71,7 @@ h1 {
   margin: 1.25rem 0 0;
   padding: 0.85rem 1rem;
   border-left: 3px solid var(--accent);
-  background: rgba(255, 255, 255, 0.55);
+  background: rgba(255, 255, 255, 0.06);
   color: var(--ink-soft);
   font-size: 0.92rem;
   line-height: 1.5;
@@ -122,19 +122,19 @@ h1 {
   padding: 0.75rem 0.85rem;
   border: 1px solid var(--line);
   border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.7);
+  background: rgba(255, 255, 255, 0.055);
   color: var(--ink);
   font: inherit;
 }
 
 .auth-input:focus {
-  outline: 2px solid rgba(10, 107, 99, 0.35);
+  outline: 2px solid rgba(99, 215, 197, 0.45);
   outline-offset: 1px;
 }
 
 .auth-error {
   margin: 0;
-  color: #8a2f2f;
+  color: #ff9292;
   font-size: 0.9rem;
   line-height: 1.4;
 }
@@ -166,8 +166,8 @@ h1 {
   margin-top: 1.75rem;
   padding: 0.85rem 1.35rem;
   border-radius: 0.55rem;
-  background: var(--ink);
-  color: #f4f7fa;
+  background: var(--accent);
+  color: #071411;
   font-weight: 650;
   letter-spacing: 0.01em;
   transition: transform 160ms ease, background 160ms ease;
@@ -178,7 +178,7 @@ h1 {
 }
 
 .primary-link:hover {
-  background: var(--ink-soft);
+  background: var(--accent-bright);
   transform: translateY(-1px);
 }
 
@@ -196,7 +196,7 @@ h1 {
 }
 
 .ghost-link:hover {
-  border-color: rgba(10, 107, 99, 0.45);
+  border-color: rgba(99, 215, 197, 0.55);
   color: var(--ink);
 }
 
@@ -228,7 +228,7 @@ h1 {
   padding: 1.25rem;
   border: 1px solid var(--line);
   border-radius: 0.8rem;
-  background: rgba(255, 255, 255, 0.58);
+  background: rgba(255, 255, 255, 0.045);
   animation: rise 480ms ease-out both;
 }
 
@@ -317,14 +317,14 @@ h1 {
   padding: 0.7rem 0.8rem;
   border: 1px solid var(--line);
   border-radius: 0.5rem;
-  background: rgba(255, 255, 255, 0.75);
+  background: rgba(255, 255, 255, 0.055);
   color: var(--ink);
   font: inherit;
   resize: vertical;
 }
 
 .collection-textarea:focus {
-  outline: 2px solid rgba(10, 107, 99, 0.35);
+  outline: 2px solid rgba(99, 215, 197, 0.45);
   outline-offset: 1px;
 }
 
@@ -335,7 +335,7 @@ h1 {
 
 .collection-error {
   margin: 0.9rem 0 0;
-  color: #8a2f2f;
+  color: #ff9292;
   font-size: 0.9rem;
 }
 

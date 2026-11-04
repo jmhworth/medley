@@ -6,8 +6,8 @@ The song collection system stores each user's musical and personal song attribut
 ## Key Points
 - **Schema**: `user_id`, exact `name`, exact credited `artist`, `musical_attributes text[]`, and `personal_attributes text[]`; `(user_id, name, artist)` is unique.
 - **Ownership**: Supabase row-level security scopes every database operation to the signed-in user. Authenticated server and browser clients use the `SUPABASE_SCHEMA` setting (default `medley`); Supabase must expose this schema through its Data API after migration activation.
-- **Daily queue**: The browser sends its local day's UTC start and end. Repeated Spotify plays with the same name and artist are reviewed once; missing database rows return two empty lists.
-- **Review**: Inputs accept one hyphen-prefixed attribute per line. Existing populated lists are displayed and preserved; empty lists require at least one entry before save. Skip is available only when both lists already contain values.
+- **Daily queue**: The browser sends its local day's UTC start and end. Repeated Spotify plays with the same name and artist are compressed into one review form; matching saved attributes are joined to that form.
+- **Review**: Inputs accept one hyphen-prefixed attribute per line. Existing populated lists are displayed and preserved; empty lists require at least one entry before save. Skip advances any song without saving, including songs the user only sampled.
 - **Persistence**: Save upserts both arrays using the user/name/artist key. Spotify play timestamps are used only to select the day's queue and are not stored.
 - **Configuration**: No song-store path or credentials live in `parameter_files/song_database.toml`.
 
@@ -32,3 +32,4 @@ HACKING
 - 2026-09-26: Replaced the JSON scaffold with user-owned Supabase song lists, RLS, daily Spotify review queue, save/skip flow, and hyphen-bullet entry.
 - 2026-09-26: Reviewed the collection implementation against the approved plan and confirmed it uses the shared cookie-authenticated Supabase session without applying migrations.
 - 2026-11-04: Added the missing `medley.songs` migration after tracing the collection endpoint's uncaught lookup failure to the absent table definition in this worktree.
+- 2026-11-04: Made skip available for every daily song and documented that repeated plays collapse by exact track name and credited artist into one review form.

@@ -106,9 +106,7 @@ export function SongCollection() {
   }
 
   function skip() {
-    if (current?.musical_attributes.length && current.personal_attributes.length) {
-      advance();
-    }
+    if (current) advance();
   }
 
   return (
@@ -206,12 +204,13 @@ export function SongCollection() {
             >
               {saving ? "Saving…" : "Save and next"}
             </button>
-            {current.musical_attributes.length > 0 &&
-              current.personal_attributes.length > 0 && (
-                <button className="ghost-link collection-action" onClick={skip}>
-                  Skip
-                </button>
-              )}
+            <button
+              className="ghost-link collection-action"
+              onClick={skip}
+              disabled={saving}
+            >
+              Skip
+            </button>
           </div>
         </article>
       )}

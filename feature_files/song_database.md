@@ -18,7 +18,7 @@ The song collection system stores each user's musical and personal song attribut
 - `src/app/api/songs/save/route.ts`: Authenticated song attribute upsert endpoint.
 - `src/app/song-collection.tsx`: Daily queue and bullet-list review UI.
 - `src/lib/supabase/server.ts`: Cookie-authenticated Supabase client configured for the project schema.
-- `supabase/migrations/20260926000000_create_songs.sql`: `medley.songs`, unique key, and user RLS policies.
+- `daedalus-migrations/202611041700_medley_create_songs.sql`: `medley.songs`, unique key, grants, and user RLS policies.
 - `src/lib/songs/index.ts`: Re-exports the song types and helpers.
 - `parameter_files/song_database.toml`: Empty feature configuration; no filesystem database path remains.
 - `feature_files/spotify_client.md`: Spotify permissions and recently played API relationship.
@@ -31,3 +31,4 @@ HACKING
 - 2026-09-05: Shipped Song schema, empty `data/songs.json`, params loader, and load/find/populate/attribute helpers under `src/lib/songs/`.
 - 2026-09-26: Replaced the JSON scaffold with user-owned Supabase song lists, RLS, daily Spotify review queue, save/skip flow, and hyphen-bullet entry.
 - 2026-09-26: Reviewed the collection implementation against the approved plan and confirmed it uses the shared cookie-authenticated Supabase session without applying migrations.
+- 2026-11-04: Added the missing `medley.songs` migration after tracing the collection endpoint's uncaught lookup failure to the absent table definition in this worktree.

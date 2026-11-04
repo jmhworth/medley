@@ -32,7 +32,9 @@ export function AuthForm({
     setMessage("");
 
     if (!configured) {
-      setMessage("Supabase is not configured yet.");
+      setMessage(
+        "Supabase runtime values are missing. See the setup note above.",
+      );
       return;
     }
 

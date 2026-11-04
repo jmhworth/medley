@@ -25,9 +25,10 @@ export default async function LoginPage({ searchParams }: LoginProps) {
         </p>
         {showMissingConfig && (
           <p className="config-notice">
-            Supabase is not configured yet. Set SUPABASE_URL and
-            SUPABASE_PUBLISHABLE_KEY, disable Confirm email
-            in the Supabase Auth settings, then restart the dev server.
+            Supabase runtime values are missing. Start Medley through Daedalus
+            so it can sync the active project environment, or set
+            SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in this project&apos;s
+            ignored .env file, then restart the dev server.
           </p>
         )}
         <AuthForm

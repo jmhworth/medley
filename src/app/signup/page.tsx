@@ -21,16 +21,20 @@ export default async function SignupPage({ searchParams }: SignupProps) {
         <p className="eyebrow">Medley</p>
         <h1>Sign up</h1>
         <p className="lede">
-          Create a Medley account with email and password. Confirm email should
-          be off in Supabase so you can start right away.
+          Create a Medley account with your email and a password.
         </p>
         {showMissingConfig && (
           <p className="config-notice">
-            Supabase is not configured yet. Set SUPABASE_URL and
-            SUPABASE_PUBLISHABLE_KEY, disable Confirm email
-            in the Supabase Auth settings, then restart the dev server.
+            Supabase runtime values are missing. Start Medley through Daedalus
+            so it can sync the active project environment, or set
+            SUPABASE_URL and SUPABASE_PUBLISHABLE_KEY in this project&apos;s
+            ignored .env file, then restart the dev server.
           </p>
         )}
+        <p className="lede">
+          For signup to create a session immediately, turn off Confirm email
+          under Authentication → Providers / Email in the Supabase Dashboard.
+        </p>
         <AuthForm
           mode="signup"
           redirectTo={postLoginRedirect}

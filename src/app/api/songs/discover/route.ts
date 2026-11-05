@@ -69,7 +69,6 @@ export async function POST(request: Request) {
     seed ? `A song was just played from Medley: ${seed}. Find songs with related emotional and musical qualities, guided by the user's request: ${prompt}` : `User request: ${prompt}`,
   ].join(" ");
   const contents: object[] = [{ role: "user", parts: [{ text: instructions }] }];
-  const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${params.geminiModel}:generateContent`;
   let finalText = "";
 
   for (let turn = 0; turn < params.maximumKeywordSearches + 3; turn += 1) {
@@ -78,21 +77,28 @@ export async function POST(request: Request) {
       : searches.size < params.minimumKeywordSearches
         ? ["search_song_library"]
         : ["search_song_library", "save_recommendations"];
-    const response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: "Use the provided tools for all library search and recommendation selection. Follow the search limits exactly." }] },
-        contents,
-        tools: [{ functionDeclarations: toolDeclarations }],
-        toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames } },
-      }),
-      cache: "no-store",
-    });
-    if (!response.ok) {
-      const providerError = await response.text();
+    let response: Response | undefined;
+    let providerError = "";
+    for (const model of params.googleAiModels) {
+      const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: "Use the provided tools for all library search and recommendation selection. Follow the search limits exactly." }] },
+          contents,
+          tools: [{ functionDeclarations: toolDeclarations }],
+          toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames } },
+        }),
+        cache: "no-store",
+      });
+      if (response.ok) break;
+      providerError = await response.text();
+      if (response.status !== 400 && response.status !== 404) break;
+    }
+    if (!response || !response.ok) {
       console.error("Google AI Studio request failed", {
-        status: response.status,
+        status: response?.status ?? 500,
         body: providerError.slice(0, 1000),
       });
       return NextResponse.json({ error: "recommendation_service_failed" }, { status: 502 });

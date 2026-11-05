@@ -8,6 +8,9 @@ export function loadDiscoveryParams() {
     minimumKeywordSearches: Number(raw.match(/minimum_keyword_searches\s*=\s*(\d+)/)?.[1] ?? 3),
     maximumKeywordSearches: Number(raw.match(/maximum_keyword_searches\s*=\s*(\d+)/)?.[1] ?? 6),
     recommendationLimit: Number(raw.match(/recommendation_limit\s*=\s*(\d+)/)?.[1] ?? 3),
-    geminiModel: raw.match(/gemini_model\s*=\s*"([^"]+)"/)?.[1] ?? "gemini-2.5-flash",
+    googleAiModels: raw.match(/google_ai_models\s*=\s*\[([^\]]+)\]/)?.[1]
+      .split(",")
+      .map((model) => model.trim().replace(/^"|"$/g, ""))
+      .filter(Boolean) ?? ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemma-4-31b-it", "gemma-4-26b-a4b-it"],
   };
 }

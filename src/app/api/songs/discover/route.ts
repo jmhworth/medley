@@ -127,6 +127,7 @@ export async function POST(request: Request) {
         }
         searches.add(keyword);
         const matches = await searchSongsByKeyword(keyword);
+        console.info("AI song library query", { keyword, resultCount: matches.length });
         const results = matches.map((song) => {
           const id = `song_${library.size + 1}`;
           const entry = { ...song, id };

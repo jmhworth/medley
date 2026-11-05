@@ -37,6 +37,8 @@ export function SongDiscovery() {
       if (!response.ok) {
         throw new Error(data.error === "google_ai_not_configured"
           ? "Add GOOGLE_AI_STUDIO_API_KEY to the server environment to enable discovery."
+          : data.error === "recommendation_service_failed"
+            ? "Google AI Studio couldn't complete the request. Check the Next.js server terminal for its error details."
           : "Could not find recommendations. Please try again.");
       }
       setRecommendations(data.recommendations ?? []);

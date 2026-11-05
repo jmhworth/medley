@@ -9,6 +9,7 @@ Song discovery turns a listener's free-form mood or activity request into up to 
 - **Session lifetime**: Recommendations are held in client state and disappear when the page is refreshed.
 - **Similar discovery**: After starting playback, the user can request similar songs; the played song and its musical and personal attributes seed the same search flow.
 - **Credentials**: `GOOGLE_AI_STUDIO_API_KEY` is server-only and configured through the ignored environment file. Tunable search limits and Gemini model are in the sibling parameter file.
+- **Provider failures**: Google AI Studio rejection status and a bounded response body are logged in the Next.js server terminal; the discovery panel directs users there for diagnosis.
 - **Database search**: `medley.search_my_songs` uses invoker permissions, the authenticated user ID, and the existing song table's row-level security.
 - **Playback**: The Spotify endpoint checks that the requested song is saved for the signed-in user before resolving and playing its Spotify track.
 
@@ -30,3 +31,4 @@ HACKING
 
 ## State Log
 - 2026-11-04: Added mood-based search over saved songs, bounded Gemini function calling, session-only recommendations, Spotify playback, and similar-song discovery.
+- 2026-11-04: Added bounded Google AI Studio failure details to server logs and a user-facing pointer to those logs for discovery 502s.

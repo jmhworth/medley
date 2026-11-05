@@ -89,7 +89,14 @@ export async function POST(request: Request) {
       }),
       cache: "no-store",
     });
-    if (!response.ok) return NextResponse.json({ error: "recommendation_service_failed" }, { status: 502 });
+    if (!response.ok) {
+      const providerError = await response.text();
+      console.error("Google AI Studio request failed", {
+        status: response.status,
+        body: providerError.slice(0, 1000),
+      });
+      return NextResponse.json({ error: "recommendation_service_failed" }, { status: 502 });
+    }
 
     const data = await response.json();
     const candidate = data.candidates?.[0];

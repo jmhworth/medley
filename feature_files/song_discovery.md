@@ -32,3 +32,4 @@ HACKING
 ## State Log
 - 2026-11-04: Added mood-based search over saved songs, bounded Gemini function calling, session-only recommendations, Spotify playback, and similar-song discovery.
 - 2026-11-04: Added bounded Google AI Studio failure details to server logs and a user-facing pointer to those logs for discovery 502s.
+- 2026-11-04: Kept the discovery submit control enabled except during a search, avoiding prompt-dependent hydration mismatch and reporting when a prompt is empty.

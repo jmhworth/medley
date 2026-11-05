@@ -23,7 +23,11 @@ export function SongDiscovery() {
 
   async function discover(event?: FormEvent, requestedPrompt = prompt) {
     event?.preventDefault();
-    if (!requestedPrompt.trim() || loading) return;
+    if (loading) return;
+    if (!requestedPrompt.trim()) {
+      setError("Describe what you want to hear first.");
+      return;
+    }
     setLoading(true);
     setError("");
     setRecommendations([]);
@@ -100,7 +104,7 @@ export function SongDiscovery() {
           placeholder="Describe what you want"
           aria-label="Describe what you want"
         />
-        <button className="primary-link discovery-submit" type="submit" disabled={loading || !prompt.trim()}>
+        <button className="primary-link discovery-submit" type="submit" disabled={loading}>
           {loading ? "Searching…" : "Find songs"}
         </button>
       </form>

@@ -94,7 +94,7 @@ export async function POST(request: Request) {
       });
       if (response.ok) break;
       providerError = await response.text();
-      if (response.status !== 400 && response.status !== 404) break;
+      if (response.status !== 400 && response.status !== 404 && response.status !== 503) break;
     }
     if (!response || !response.ok) {
       console.error("Google AI Studio request failed", {

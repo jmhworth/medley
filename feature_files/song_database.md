@@ -9,6 +9,7 @@ The song collection system stores each user's musical and personal song attribut
 - **Daily queue**: The browser sends its local day's UTC start and end. Repeated Spotify plays with the same name and artist are compressed into one review form; matching saved attributes are joined to that form.
 - **Review**: Inputs accept one hyphen-prefixed attribute per line. Existing populated lists are displayed and preserved; empty lists require at least one entry before save. Skip advances any song without saving, including songs the user only sampled.
 - **Persistence**: Save upserts both arrays using the user/name/artist key. Spotify play timestamps are used only to select the day's queue and are not stored.
+- **Discovery search**: `medley.search_my_songs` searches song names, credited artists, and both attribute arrays using the caller's authenticated identity and row-level security; see `feature_files/song_discovery.md` for recommendation behavior.
 - **Configuration**: No song-store path or credentials live in `parameter_files/song_database.toml`.
 
 ## Relevant Files
@@ -20,6 +21,7 @@ The song collection system stores each user's musical and personal song attribut
 - `src/lib/supabase/server.ts`: Cookie-authenticated Supabase client configured for the project schema.
 - `daedalus-migrations/202611041700_medley_create_songs.sql`: `medley.songs`, unique key, grants, and user RLS policies.
 - `src/lib/songs/index.ts`: Re-exports the song types and helpers.
+- `daedalus-migrations/202611041930_medley_search_songs.sql`: Adds the invoker-secured keyword search function used by song discovery.
 - `parameter_files/song_database.toml`: Empty feature configuration; no filesystem database path remains.
 - `feature_files/spotify_client.md`: Spotify permissions and recently played API relationship.
 
@@ -33,3 +35,4 @@ HACKING
 - 2026-09-26: Reviewed the collection implementation against the approved plan and confirmed it uses the shared cookie-authenticated Supabase session without applying migrations.
 - 2026-11-04: Added the missing `medley.songs` migration after tracing the collection endpoint's uncaught lookup failure to the absent table definition in this worktree.
 - 2026-11-04: Made skip available for every daily song and documented that repeated plays collapse by exact track name and credited artist into one review form.
+- 2026-11-04: Added the authenticated keyword search interface used by discovery while preserving the existing saved-song ownership model.

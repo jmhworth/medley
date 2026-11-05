@@ -35,7 +35,7 @@ export async function GET(request: NextRequest) {
     client_id: clientId,
     response_type: "code",
     redirect_uri: redirectUri,
-    scope: "playlist-read-private playlist-read-collaborative user-read-recently-played",
+    scope: "playlist-read-private playlist-read-collaborative user-read-recently-played user-modify-playback-state",
     state,
     code_challenge_method: "S256",
     code_challenge: challenge,

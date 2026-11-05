@@ -15,6 +15,16 @@ export async function getSongsForKeys(keys: SongKey[]) {
   return (data ?? []) as Song[];
 }
 
+export async function searchSongsByKeyword(keyword: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase.rpc("search_my_songs", {
+    p_keyword: keyword,
+  });
+
+  if (error) throw error;
+  return (data ?? []) as Song[];
+}
+
 export async function saveSong(song: Omit<Song, "user_id">, userId: string) {
   const supabase = await createServerSupabaseClient();
   const { data, error } = await supabase

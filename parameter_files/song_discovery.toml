@@ -1,0 +1,11 @@
+# Minimum distinct library searches before selecting suggestions
+minimum_keyword_searches = 3
+
+# Maximum keyword searches in one discovery request
+maximum_keyword_searches = 6
+
+# Maximum number of songs returned to the discovery panel
+recommendation_limit = 3
+
+# Google AI Studio model used for function calling
+gemini_model = "gemini-2.5-flash"

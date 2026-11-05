@@ -103,3 +103,39 @@ export async function listRecentlyPlayed(start: string, end: string) {
 
   return tracks;
 }
+
+export async function playSavedSong(name: string, artist: string) {
+  const token = await getAccessToken();
+  if (!token) throw new Error("spotify_session_missing");
+
+  const query = new URLSearchParams({
+    q: `track:${name} artist:${artist}`,
+    type: "track",
+    limit: "5",
+  });
+  const searchResponse = await fetch(
+    `https://api.spotify.com/v1/search?${query.toString()}`,
+    { headers: { Authorization: `Bearer ${token}` }, cache: "no-store" },
+  );
+  if (!searchResponse.ok) throw new Error(`spotify_search_failed:${searchResponse.status}`);
+  const searchData = await searchResponse.json();
+  const tracks = searchData.tracks?.items ?? [];
+  const expectedName = name.toLowerCase();
+  const expectedArtist = artist.toLowerCase();
+  const track = tracks.find((candidate: { name: string; artists: { name: string }[] }) =>
+    candidate.name.toLowerCase() === expectedName &&
+    candidate.artists.map((item) => item.name).join(", ").toLowerCase() === expectedArtist,
+  );
+
+  if (!track?.uri) throw new Error("spotify_track_not_found");
+
+  const playResponse = await fetch("https://api.spotify.com/v1/me/player/play", {
+    method: "PUT",
+    headers: {
+      Authorization: `Bearer ${token}`,
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ uris: [track.uri] }),
+  });
+  if (!playResponse.ok) throw new Error(`spotify_play_failed:${playResponse.status}`);
+}

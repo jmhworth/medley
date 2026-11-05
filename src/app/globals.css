@@ -232,6 +232,101 @@ h1 {
   animation: rise 480ms ease-out both;
 }
 
+.discovery-panel {
+  padding: 1.4rem;
+  border: 1px solid var(--line);
+  border-radius: 0.8rem;
+  background: linear-gradient(145deg, rgba(99, 215, 197, 0.09), rgba(255, 255, 255, 0.035));
+  animation: rise 480ms ease-out both;
+}
+
+.discovery-panel h2 {
+  margin: 0;
+  font-family: var(--font-syne), sans-serif;
+  font-size: clamp(1.4rem, 4vw, 1.9rem);
+  letter-spacing: -0.035em;
+}
+
+.discovery-form {
+  display: flex;
+  gap: 0.65rem;
+  margin-top: 1rem;
+}
+
+.discovery-input {
+  min-width: 0;
+  flex: 1;
+  padding: 0.85rem 1rem;
+  border: 1px solid var(--line);
+  border-radius: 0.55rem;
+  background: rgba(3, 9, 13, 0.55);
+  color: var(--ink);
+  font: inherit;
+}
+
+.discovery-input:focus {
+  outline: 2px solid rgba(99, 215, 197, 0.45);
+  outline-offset: 1px;
+}
+
+.discovery-submit {
+  flex: none;
+  margin-top: 0;
+  border: 0;
+  cursor: pointer;
+  font: inherit;
+}
+
+.discovery-submit:disabled {
+  cursor: wait;
+  opacity: 0.6;
+}
+
+.recommendation-list {
+  margin-top: 1.5rem;
+}
+
+.recommendation-list h3 {
+  margin: 0 0 0.5rem;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 1.1rem;
+}
+
+.recommendation-card {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 1rem;
+  padding: 0.9rem 0;
+  border-top: 1px solid var(--line);
+}
+
+.recommendation-title {
+  margin: 0;
+  font-family: var(--font-syne), sans-serif;
+  font-size: 1rem;
+  font-weight: 650;
+}
+
+.recommendation-reason {
+  margin: 0.4rem 0 0;
+  color: var(--ink-soft);
+  font-size: 0.88rem;
+  line-height: 1.45;
+}
+
+.similar-row {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 0.8rem;
+  margin-top: 0.75rem;
+}
+
+.similar-row .ghost-link {
+  flex: none;
+}
+
 .collection-heading-row,
 .collection-actions {
   display: flex;
@@ -471,5 +566,17 @@ h1 {
   .collection-heading-row {
     align-items: flex-start;
     flex-direction: column;
+  }
+
+  .discovery-form {
+    flex-direction: column;
+  }
+
+  .discovery-submit {
+    justify-content: center;
+  }
+
+  .recommendation-card {
+    align-items: flex-start;
   }
 }

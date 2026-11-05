@@ -1,9 +1,8 @@
 import Link from "next/link";
-import { PlaylistBrowser } from "./playlist-browser";
 import { getMedleyUser } from "@/lib/supabase/auth";
-import { listPlaylists } from "@/lib/spotify/api";
 import { hasSpotifySession } from "@/lib/spotify/auth";
 import { SongCollection } from "./song-collection";
+import { SongDiscovery } from "./song-discovery";
 
 type HomeProps = {
   searchParams: Promise<{
@@ -22,10 +21,9 @@ export default async function Home({ searchParams }: HomeProps) {
       <main className="home-page">
         <div className="home-panel">
           <p className="eyebrow">Medley</p>
-          <h1>Playlists</h1>
+          <h1>Find your next song</h1>
           <p className="lede">
-            Connect your Spotify account to browse your playlists and the songs
-            inside them.
+            Connect Spotify to play songs you have saved in Medley.
           </p>
           <p className="session-line">
             {accountLabel}
@@ -37,7 +35,7 @@ export default async function Home({ searchParams }: HomeProps) {
           {spotifyError === "missing_config" && (
             <p className="config-notice">
               Spotify is not configured yet. Add SPOTIFY_CLIENT_ID and
-              SPOTIFY_REDIRECT_URI to .env.local, then restart the dev server.
+              SPOTIFY_REDIRECT_URI to the ignored .env file, then restart the dev server.
             </p>
           )}
           <Link
@@ -52,17 +50,15 @@ export default async function Home({ searchParams }: HomeProps) {
     );
   }
 
-  const playlists = await listPlaylists();
-
   return (
     <main className="browse-page">
       <header className="browse-header">
         <div>
           <p className="eyebrow">Medley</p>
-          <h1>Your playlists</h1>
+          <h1>Find your next song</h1>
           <p className="lede">
-            {playlists.length} playlist{playlists.length === 1 ? "" : "s"}. Open
-            one to see its tracks.
+            Describe the mood, moment, or sound you want. Medley will search
+            your saved songs and find a few that fit.
           </p>
           <p className="session-line">
             {accountLabel}
@@ -77,8 +73,8 @@ export default async function Home({ searchParams }: HomeProps) {
         </Link>
       </header>
 
+      <SongDiscovery />
       <SongCollection />
-      <PlaylistBrowser playlists={playlists} />
     </main>
   );
 }

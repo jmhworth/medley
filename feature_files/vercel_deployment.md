@@ -9,6 +9,7 @@ Documents the production deployment contract for Medley's Next.js App Router app
 - **Credentials**: The runtime does not need a Spotify Client Secret, Supabase secret key, database URL, or Supabase access token. Never put these credentials in feature parameter files.
 - **Provider setup**: Register the production callback URL with Spotify. The Supabase `medley` schema must be activated and exposed in Data API settings before hosted data requests can succeed.
 - **Preview deployments**: Spotify redirect URLs must match exactly; a preview hostname requires a separately registered callback and matching environment variable.
+- **Function duration**: The song discovery route sets a 60-second maximum because its provider workflow can make several sequential Gemini requests.
 - **Runtime files**: Server-side parameter readers use committed files in `parameter_files/`; these are part of the repository deployment input, not Vercel environment variables.
 
 ## Relevant Files

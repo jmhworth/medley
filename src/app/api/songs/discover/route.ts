@@ -4,6 +4,8 @@ import { loadDiscoveryParams } from "@/lib/songs/discovery-params";
 import type { Song } from "@/lib/songs/types";
 import { getMedleyUser } from "@/lib/supabase/auth";
 
+export const maxDuration = 60;
+
 type ToolSong = Song & { id: string };
 type Recommendation = { song: Song; reason: string };
 

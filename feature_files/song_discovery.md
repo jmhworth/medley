@@ -1,18 +1,19 @@
 # Song Discovery
 
 ## Summary
-Song discovery turns a listener's free-form mood or activity request into up to three recommendations drawn only from their saved `medley.songs`. An authenticated Next.js route coordinates Google AI Studio Gemini function calls, keyword search through the user's Supabase session, and a bounded in-memory recommendation list; recommendations stream to the client one at a time so the listener can start before discovery finishes.
+Song discovery turns a listener's free-form mood or activity request into up to three recommendations drawn only from their saved `medley.songs`. The client coordinates short authenticated Next.js requests; each request asks Google AI Studio Gemini for one next action and carries the original prompt, completed searches, and prior recommendations forward, keeping multi-step discovery out of a single long-running function invocation.
 
 ## Key Points
-- **Search limits**: Gemini must call the search tool with at least three distinct keywords and can search at most six per request; the server tracks and enforces distinct keyword count.
+- **Search limits**: Gemini must call the search tool with at least three distinct keywords before choosing suggestions and can search at most six in a discovery session; the route carries and enforces the distinct keyword list across requests.
 - **Query tracking**: Each completed AI keyword search is logged in the server developer console with its keyword and result count, making search effectiveness visible without logging song records.
-- **Grounded results**: Search tool results are user-scoped saved songs. The save tool accepts only IDs returned by searches and caps recommendations at three.
+- **Grounded results**: Search results are rebuilt from the authenticated user's saved songs on each step. The recommendation tool accepts only a song ID found in those results and caps recommendations at three.
 - **Session lifetime**: Recommendations are held in client state and disappear when the page is refreshed.
-- **Progressive loading**: The discovery route streams each selected recommendation as newline-delimited JSON; the client appends it to the visible list and listening queue while the route searches for later recommendations.
+- **Stepwise loading**: The client makes one route request per Gemini decision and appends each selected recommendation to the visible list and listening queue while it requests later recommendations.
+- **Context continuity**: Each step includes the original request, any played-song seed, completed search keywords, prior recommendations, and the saved songs found by those searches.
 - **Similar discovery**: After starting playback, the user can request similar songs; the played song and its musical and personal attributes seed the same search flow.
 - **Credentials and models**: `GOOGLE_AI_STUDIO_API_KEY` is server-only and configured through the ignored environment file. The sibling parameter file orders Google AI models: Gemini 3.8 Flash, Gemini 3.5 Flash-Lite, then Gemma 4 models. HTTP 503 high-demand responses advance to the next configured model, and the request stops only after the configured model list is exhausted or another non-fallback error occurs.
 - **Provider failures**: Google AI Studio rejection status and a bounded response body are logged in the Next.js server terminal; the discovery panel directs users there for diagnosis.
-- **Function duration**: The Vercel route allows up to 60 seconds because discovery may need several sequential Gemini tool calls and model fallbacks.
+- **Function duration**: Each Vercel route invocation makes one Gemini decision; the client repeats requests until it reaches the recommendation limit or the model finds no match.
 - **Database search**: `medley.search_my_songs` uses invoker permissions, the authenticated user ID, and the existing song table's row-level security.
 - **Playback**: The Spotify endpoint checks that the requested song is saved for the signed-in user before resolving and playing its Spotify track; unmatched catalog results return a specific not-found error.
 
@@ -43,3 +44,4 @@ HACKING
 - 2026-11-05: Improved recommendation playback matching and surfaced Spotify track lookup failures with a targeted message.
 - 2026-11-05: Streamed discovery recommendations individually so playback can begin while later recommendations continue loading into the queue.
 - 2026-11-06: Raised the discovery route's Vercel duration limit to 60 seconds to accommodate sequential Gemini tool calls and model fallbacks.
+- 2026-11-05: Split discovery into one Gemini decision per request and carried prompt, search, and recommendation context forward from the client to avoid accumulating tool-call latency in a single invocation.

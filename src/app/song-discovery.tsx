@@ -40,43 +40,34 @@ export function SongDiscovery({
     setRecommendations([]);
     onRecommendations?.([]);
     try {
-      const response = await fetch("/api/songs/discover", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ prompt: requestedPrompt, seed }),
-      });
-      if (!response.ok) {
-        const data = await response.json();
-        throw new Error(data.error === "google_ai_not_configured"
-          ? "Add GOOGLE_AI_STUDIO_API_KEY to the server environment to enable discovery."
-          : data.error === "recommendation_service_failed"
-            ? "Google AI Studio couldn't complete the request. Check the Next.js server terminal for its error details."
-          : "Could not find recommendations. Please try again.");
-      }
-      if (!response.body) throw new Error("Could not read song recommendations.");
-      const reader = response.body.getReader();
-      const decoder = new TextDecoder();
-      let pending = "";
       let streamRecommendations: Recommendation[] = [];
-      while (true) {
-        const { done, value } = await reader.read();
-        pending += decoder.decode(value, { stream: !done });
-        const lines = pending.split("\n");
-        pending = lines.pop() ?? "";
-        for (const line of lines) {
-          if (!line.trim()) continue;
-          const event = JSON.parse(line);
-          if (event.type === "recommendation") {
-            streamRecommendations = [...streamRecommendations, event.recommendation];
-            setRecommendations(streamRecommendations);
-            onRecommendations?.(streamRecommendations.map((item) => item.song));
-          } else if (event.type === "error") {
-            throw new Error(event.error === "recommendation_service_failed"
+      let searches: string[] = [];
+      let feedback = "";
+      let done = false;
+      for (let step = 0; step < 12 && !done; step += 1) {
+        const response = await fetch("/api/songs/discover", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({ prompt: requestedPrompt, seed, searches, recommendations: streamRecommendations, feedback }),
+        });
+        const data = await response.json();
+        if (!response.ok) {
+          throw new Error(data.error === "google_ai_not_configured"
+            ? "Add GOOGLE_AI_STUDIO_API_KEY to the server environment to enable discovery."
+            : data.error === "recommendation_service_failed"
               ? "Google AI Studio couldn't complete the request. Check the Next.js server terminal for its error details."
-              : "Could not search your saved songs. Please try again.");
-          }
+              : data.error === "song_search_failed"
+                ? "Could not search your saved songs. Please try again."
+                : "Could not find recommendations. Please try again.");
         }
-        if (done) break;
+        searches = data.searches ?? searches;
+        feedback = data.feedback ?? "";
+        if (data.recommendation) {
+          streamRecommendations = [...streamRecommendations, data.recommendation];
+          setRecommendations(streamRecommendations);
+          onRecommendations?.(streamRecommendations.map((item) => item.song));
+        }
+        done = Boolean(data.done);
       }
     } catch (discoverError) {
       console.error("Song discovery request failed", discoverError);

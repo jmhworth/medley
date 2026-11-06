@@ -2,6 +2,7 @@ export type Song = {
   user_id: string;
   name: string;
   artist: string;
+  notes: string;
   musical_attributes: string[];
   personal_attributes: string[];
 };

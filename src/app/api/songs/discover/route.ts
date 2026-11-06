@@ -70,6 +70,7 @@ export async function POST(request: Request) {
           id: item.id,
           name: item.name,
           artist: item.artist,
+          notes: typeof item.notes === "string" ? item.notes : "",
           musical_attributes: Array.isArray(item.musical_attributes) ? item.musical_attributes : [],
           personal_attributes: Array.isArray(item.personal_attributes) ? item.personal_attributes : [],
         });
@@ -82,10 +83,11 @@ export async function POST(request: Request) {
     : searches.length >= params.maximumKeywordSearches || previousRecommendations.length >= params.recommendationLimit
       ? ["recommend_song"]
       : ["search_song_library", "recommend_song"];
-  const searchResults = [...library.values()].map(({ id, name, artist, musical_attributes, personal_attributes }) => ({
+  const searchResults = [...library.values()].map(({ id, name, artist, notes, musical_attributes, personal_attributes }) => ({
     id,
     name,
     artist,
+    notes,
     musical_attributes,
     personal_attributes,
   }));

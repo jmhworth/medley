@@ -17,6 +17,7 @@ export async function POST(request: Request) {
       {
         name: song.name,
         artist: song.artist,
+        notes: typeof song.notes === "string" ? song.notes : undefined,
         musical_attributes: song.musical_attributes,
         personal_attributes: song.personal_attributes,
       },

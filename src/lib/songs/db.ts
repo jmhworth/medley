@@ -8,7 +8,7 @@ export async function getSongsForKeys(keys: SongKey[]) {
   const names = [...new Set(keys.map((key) => key.name))];
   const { data, error } = await supabase
     .from("songs")
-    .select("user_id, name, artist, musical_attributes, personal_attributes")
+    .select("user_id, name, artist, notes, musical_attributes, personal_attributes")
     .in("name", names);
 
   if (error) throw error;
@@ -25,59 +25,32 @@ export async function searchSongsByKeyword(keyword: string) {
   return (data ?? []) as Song[];
 }
 
-export async function saveSong(song: Omit<Song, "user_id">, userId: string) {
+export async function saveSong(
+  song: Omit<Song, "user_id" | "notes"> & { notes?: string },
+  userId: string,
+) {
   const supabase = await createServerSupabaseClient();
+  let notes = song.notes;
+  if (notes === undefined) {
+    const { data: existing, error: lookupError } = await supabase
+      .from("songs")
+      .select("notes")
+      .eq("user_id", userId)
+      .eq("name", song.name)
+      .eq("artist", song.artist)
+      .maybeSingle();
+    if (lookupError) throw lookupError;
+    notes = existing?.notes ?? "";
+  }
   const { data, error } = await supabase
     .from("songs")
     .upsert(
-      { ...song, user_id: userId },
+      { ...song, notes, user_id: userId },
       { onConflict: "user_id,name,artist" },
     )
-    .select("user_id, name, artist, musical_attributes, personal_attributes")
+    .select("user_id, name, artist, notes, musical_attributes, personal_attributes")
     .single();
 
   if (error) throw error;
   return data as Song;
-}
-
-export async function getSongMomentsForDay(day: string) {
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("song_moments")
-    .select("song_name, artist, note")
-    .eq("listened_on", day);
-
-  if (error) throw error;
-  return data ?? [];
-}
-
-export async function saveSongMoment(
-  moment: {
-    name: string;
-    artist: string;
-    day: string;
-    note: string;
-    play_count: number;
-  },
-  userId: string,
-) {
-  const supabase = await createServerSupabaseClient();
-  const { data, error } = await supabase
-    .from("song_moments")
-    .upsert(
-      {
-        user_id: userId,
-        song_name: moment.name,
-        artist: moment.artist,
-        listened_on: moment.day,
-        note: moment.note,
-        play_count: moment.play_count,
-      },
-      { onConflict: "user_id,listened_on,song_name,artist" },
-    )
-    .select("song_name, artist, listened_on, note, play_count")
-    .single();
-
-  if (error) throw error;
-  return data;
 }

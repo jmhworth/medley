@@ -8,7 +8,7 @@ import { SongCollection } from "./song-collection";
 import { SongDiscovery } from "./song-discovery";
 import { SongAttributeFeedback } from "./song-attribute-feedback";
 
-type Song = { name: string; artist: string; musical_attributes: string[]; personal_attributes: string[] };
+type Song = { name: string; artist: string; notes: string; musical_attributes: string[]; personal_attributes: string[] };
 type QueueTrack = { spotifyId?: string; song: Song };
 
 export function ListeningWorkspace() {
@@ -26,7 +26,7 @@ export function ListeningWorkspace() {
   }, []);
 
   function selectPlaylistTrack(track: SpotifyTrack, tracks: SpotifyTrack[]) {
-    const nextQueue = tracks.map((item) => ({ spotifyId: item.id, song: { name: item.name, artist: item.artists, musical_attributes: [], personal_attributes: [] } }));
+    const nextQueue = tracks.map((item) => ({ spotifyId: item.id, song: { name: item.name, artist: item.artists, notes: "", musical_attributes: [], personal_attributes: [] } }));
     const selectedIndex = nextQueue.findIndex((item) => item.spotifyId === track.id);
     setQueue(nextQueue);
     setSelected(nextQueue[selectedIndex]);

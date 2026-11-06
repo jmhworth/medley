@@ -6,6 +6,7 @@ import { SongAttributeFeedback } from "./song-attribute-feedback";
 type CollectionSong = {
   name: string;
   artist: string;
+  notes: string;
   musical_attributes: string[];
   personal_attributes: string[];
   play_count: number;
@@ -100,6 +101,7 @@ export function SongCollection() {
           body: JSON.stringify({
             name: current.name,
             artist: current.artist,
+            notes: current.notes,
             musical_attributes: musical,
             personal_attributes: personal,
           }),
@@ -177,6 +179,7 @@ export function SongCollection() {
           </p>
 
           <SongAttributeFeedback musicalAttributes={current.musical_attributes} personalAttributes={current.personal_attributes} musicalText={musicalText} personalText={personalText} onMusicalTextChange={setMusicalText} onPersonalTextChange={setPersonalText} />
+          <label className="collection-label">Song notes<textarea className="collection-textarea" value={current.notes} onChange={(event) => setSongs((items) => items.map((song, index) => index === currentIndex ? { ...song, notes: event.target.value } : song))} placeholder="General notes about this song" /></label>
 
           <div className="collection-actions">
             <button

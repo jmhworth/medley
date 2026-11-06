@@ -67,6 +67,7 @@ export async function GET(request: Request) {
     );
     return {
       ...key,
+      notes: saved?.notes ?? "",
       musical_attributes: saved?.musical_attributes ?? [],
       personal_attributes: saved?.personal_attributes ?? [],
     };

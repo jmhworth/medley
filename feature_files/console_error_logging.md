@@ -21,7 +21,6 @@ Console error logging keeps actionable error objects visible in the browser cons
 - `src/app/api/songs/collection/route.ts`: Logs Spotify listening-history failures.
 - `src/app/api/songs/collection/route.ts`: Logs saved-song lookup failures while building the listening queue.
 - `src/app/api/songs/save/route.ts`: Logs song persistence failures.
-- `src/app/api/songs/moment/route.ts`: Logs listening-note persistence failures.
 - `src/app/api/songs/discover/route.ts`: Logs Google AI Studio provider failures and search counts.
 - `parameter_files/console_error_logging.toml`: Empty parameter file; logging has no tunable values.
 

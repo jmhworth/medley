@@ -7,6 +7,7 @@ type Recommendation = {
   song: {
     name: string;
     artist: string;
+    notes: string;
     musical_attributes: string[];
     personal_attributes: string[];
   };

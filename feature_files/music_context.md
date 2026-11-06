@@ -26,3 +26,4 @@ HACKING
 
 ## State Log
 - 2026-11-06: Added the persistent user-scoped music context layer, third-save AI refresh, and discovery prompt integration.
+- 2026-11-06: Typed music-context feedback inputs to require only song identity and attributes, matching the evidence used to update listener context.

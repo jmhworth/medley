@@ -69,7 +69,7 @@ async function getFrequentRecentSongs() {
 
 async function generateUpdatedContext(
   currentContext: string,
-  song: Omit<Song, "user_id">,
+  song: Omit<Song, "user_id" | "notes">,
   frequentSongs: Awaited<ReturnType<typeof getFrequentRecentSongs>>,
 ) {
   const apiKey = process.env.GOOGLE_AI_STUDIO_API_KEY?.trim();
@@ -114,7 +114,10 @@ async function generateUpdatedContext(
   throw new Error(lastError || "google_ai_context_update_failed");
 }
 
-export async function updateMusicContextAfterFeedback(song: Omit<Song, "user_id">, userId: string) {
+export async function updateMusicContextAfterFeedback(
+  song: Omit<Song, "user_id" | "notes">,
+  userId: string,
+) {
   const params = loadMusicContextParams();
   const feedbackCount = await incrementFeedbackCount();
   if (feedbackCount % params.feedbackUpdatesEvery !== 0) return;

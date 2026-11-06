@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import type { SpotifyPlaylist, SpotifyTrack } from "@/lib/spotify/api";
 import { PlaylistBrowser } from "./playlist-browser";
 import { SongCollection } from "./song-collection";
@@ -54,7 +55,14 @@ export function ListeningWorkspace() {
       method: "POST", headers: { "Content-Type": "application/json" },
       body: JSON.stringify(selected.spotifyId ? { spotifyId: selected.spotifyId } : { name: selected.song.name, artist: selected.song.artist }),
     });
-    setMessage(response.ok ? "Playing on Spotify." : "Could not start playback. Check Spotify permissions and your active device.");
+    if (response.ok) {
+      setMessage("Playing on Spotify.");
+    } else {
+      const data = await response.json();
+      setMessage(data.error === "spotify_session_missing"
+        ? "Your Spotify connection is missing. Connect Spotify again to keep listening."
+        : "Could not start playback. Check Spotify permissions and your active device.");
+    }
     setBusy(false);
   }
 
@@ -92,6 +100,6 @@ export function ListeningWorkspace() {
     <nav className="listening-tabs" aria-label="Listening sections">{["Library + Search", "Feedback", "Play + Feedback"].map((name) => <button key={name} className={tab === name ? "listening-tab active" : "listening-tab"} onClick={() => setTab(name)}>{name}</button>)}</nav>
     {tab === "Library + Search" && <><section className="discovery-panel"><p className="eyebrow">Your library</p><h2>Play a playlist</h2><PlaylistBrowser playlists={playlists} onSelectTrack={selectPlaylistTrack} /></section><SongDiscovery onSelectSong={selectSearchSong} /></>}
     {tab === "Feedback" && <SongCollection />}
-    {tab === "Play + Feedback" && <section className="collection-panel"><p className="eyebrow">Now playing</p>{selected ? <><h2>{selected.song.name}</h2><p className="track-artists">{selected.song.artist}</p><div className="collection-actions"><button className="primary-link collection-action" onClick={playCurrent} disabled={busy}>{busy ? "Starting…" : "Play"}</button><button className="ghost-link collection-action" onClick={skip}>Skip</button></div><SongAttributeFeedback musicalAttributes={selected.song.musical_attributes} personalAttributes={selected.song.personal_attributes} musicalText={musicalText} personalText={personalText} onMusicalTextChange={setMusicalText} onPersonalTextChange={setPersonalText} /><button className="primary-link collection-action" onClick={saveNotes} disabled={busy}>Save notes</button>{message && <p className="collection-copy" role="status">{message}</p>}</> : <p className="collection-copy">Choose a playlist track or search recommendation to start listening.</p>}</section>}
+    {tab === "Play + Feedback" && <section className="collection-panel"><p className="eyebrow">Now playing</p>{selected ? <><h2>{selected.song.name}</h2><p className="track-artists">{selected.song.artist}</p><div className="collection-actions"><button className="primary-link collection-action" onClick={playCurrent} disabled={busy}>{busy ? "Starting…" : "Play"}</button><button className="ghost-link collection-action" onClick={skip}>Skip</button></div><SongAttributeFeedback musicalAttributes={selected.song.musical_attributes} personalAttributes={selected.song.personal_attributes} musicalText={musicalText} personalText={personalText} onMusicalTextChange={setMusicalText} onPersonalTextChange={setPersonalText} /><button className="primary-link collection-action" onClick={saveNotes} disabled={busy}>Save notes</button>{message && <p className="collection-copy" role="status">{message}{message.startsWith("Your Spotify connection is missing") && <> <Link className="inline-link" href="/api/spotify/login" prefetch={false}>Connect Spotify</Link></>}</p>}</> : <p className="collection-copy">Choose a playlist track or search recommendation to start listening.</p>}</section>}
   </>;
 }

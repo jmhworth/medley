@@ -7,13 +7,20 @@ type CollectionSong = {
   artist: string;
   musical_attributes: string[];
   personal_attributes: string[];
+  play_count: number;
+  moment_note: string;
 };
 
 function localDayRange() {
   const today = new Date();
   const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
   const end = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-  return { start: start.toISOString(), end: end.toISOString() };
+  const day = [
+    today.getFullYear(),
+    String(today.getMonth() + 1).padStart(2, "0"),
+    String(today.getDate()).padStart(2, "0"),
+  ].join("-");
+  return { start: start.toISOString(), end: end.toISOString(), day };
 }
 
 function parseBullets(value: string) {
@@ -29,19 +36,21 @@ export function SongCollection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [musicalText, setMusicalText] = useState("");
   const [personalText, setPersonalText] = useState("");
+  const [momentText, setMomentText] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [started, setStarted] = useState(false);
+  const [collectionDay, setCollectionDay] = useState("");
   const [error, setError] = useState("");
   const current = songs[currentIndex];
 
   async function startCollection() {
     setLoading(true);
     setError("");
-    const { start, end } = localDayRange();
+    const { start, end, day } = localDayRange();
     try {
       const response = await fetch(
-        `/api/songs/collection?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`,
+        `/api/songs/collection?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&day=${encodeURIComponent(day)}`,
       );
       if (response.status === 403) {
         throw new Error("Spotify needs updated permission to read recent plays.");
@@ -49,10 +58,12 @@ export function SongCollection() {
       if (!response.ok) throw new Error("Could not load today's plays.");
       const data = await response.json();
       setSongs(data.songs ?? []);
+      setCollectionDay(day);
       setCurrentIndex(0);
       setStarted(true);
       setMusicalText("");
       setPersonalText("");
+      setMomentText(data.songs?.[0]?.moment_note ?? "");
     } catch (collectionError) {
       setError(
         collectionError instanceof Error
@@ -65,9 +76,11 @@ export function SongCollection() {
   }
 
   function advance() {
-    setCurrentIndex((index) => index + 1);
+    const nextIndex = currentIndex + 1;
+    setCurrentIndex(nextIndex);
     setMusicalText("");
     setPersonalText("");
+    setMomentText(songs[nextIndex]?.moment_note ?? "");
   }
 
   async function saveAndAdvance() {
@@ -78,7 +91,9 @@ export function SongCollection() {
     const personal = current.personal_attributes.length
       ? current.personal_attributes
       : parseBullets(personalText);
-    if (musical.length === 0 || personal.length === 0) {
+    const hasSongAttributes = musical.length > 0 && personal.length > 0;
+    const hasMoment = Boolean(momentText.trim() || current.moment_note);
+    if (!hasSongAttributes && !hasMoment) {
       setError("Add at least one bullet to each empty list before saving.");
       return;
     }
@@ -86,17 +101,35 @@ export function SongCollection() {
     setSaving(true);
     setError("");
     try {
-      const response = await fetch("/api/songs/save", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          name: current.name,
-          artist: current.artist,
-          musical_attributes: musical,
-          personal_attributes: personal,
-        }),
-      });
-      if (!response.ok) throw new Error("Could not save this song.");
+      if (hasSongAttributes) {
+        const response = await fetch("/api/songs/save", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: current.name,
+            artist: current.artist,
+            musical_attributes: musical,
+            personal_attributes: personal,
+          }),
+        });
+        if (!response.ok) throw new Error("Could not save this song.");
+      }
+      if (hasMoment) {
+        const momentResponse = await fetch("/api/songs/moment", {
+          method: "POST",
+          headers: { "Content-Type": "application/json" },
+          body: JSON.stringify({
+            name: current.name,
+            artist: current.artist,
+            day: collectionDay,
+            note: momentText.trim(),
+            play_count: current.play_count,
+          }),
+        });
+        if (!momentResponse.ok) {
+          throw new Error("Song saved, but could not save your note about today.");
+        }
+      }
       advance();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Could not save this song.");
@@ -153,6 +186,22 @@ export function SongCollection() {
           </p>
           <h3>{current.name}</h3>
           <p className="track-artists">{current.artist}</p>
+          <p className="collection-copy">
+            Played {current.play_count} {current.play_count === 1 ? "time" : "times"} today
+          </p>
+
+          <div className="attribute-section">
+            <h4>What made this song so good today?</h4>
+            <label className="collection-label">
+              Capture what stood out in this moment. Save and next stores this note.
+              <textarea
+                className="collection-textarea moment-textarea"
+                value={momentText}
+                onChange={(event) => setMomentText(event.target.value)}
+                placeholder="What did you notice or feel when it came on?"
+              />
+            </label>
+          </div>
 
           <div className="attribute-section">
             <h4>Musical attributes</h4>

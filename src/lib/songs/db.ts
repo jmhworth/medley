@@ -39,3 +39,45 @@ export async function saveSong(song: Omit<Song, "user_id">, userId: string) {
   if (error) throw error;
   return data as Song;
 }
+
+export async function getSongMomentsForDay(day: string) {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("song_moments")
+    .select("song_name, artist, note")
+    .eq("listened_on", day);
+
+  if (error) throw error;
+  return data ?? [];
+}
+
+export async function saveSongMoment(
+  moment: {
+    name: string;
+    artist: string;
+    day: string;
+    note: string;
+    play_count: number;
+  },
+  userId: string,
+) {
+  const supabase = await createServerSupabaseClient();
+  const { data, error } = await supabase
+    .from("song_moments")
+    .upsert(
+      {
+        user_id: userId,
+        song_name: moment.name,
+        artist: moment.artist,
+        listened_on: moment.day,
+        note: moment.note,
+        play_count: moment.play_count,
+      },
+      { onConflict: "user_id,listened_on,song_name,artist" },
+    )
+    .select("song_name, artist, listened_on, note, play_count")
+    .single();
+
+  if (error) throw error;
+  return data;
+}

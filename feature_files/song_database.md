@@ -7,6 +7,7 @@ The song collection system stores each user's musical and personal song attribut
 - **Schema**: `user_id`, exact `name`, exact credited `artist`, `musical_attributes text[]`, and `personal_attributes text[]`; `(user_id, name, artist)` is unique.
 - **Ownership**: Supabase row-level security scopes every database operation to the signed-in user. Authenticated server and browser clients use the `SUPABASE_SCHEMA` setting (default `medley`); Supabase must expose this schema through its Data API after migration activation.
 - **Daily queue**: The browser sends its local day's UTC start and end. Repeated Spotify plays with the same name and artist are compressed into one review form; matching saved attributes are joined to that form.
+- **Daily ranking and reflection**: The queue ranks grouped songs by that day's play count and stores date-specific notes separately in `medley.song_moments`; see `feature_files/daily_song_reflection.md`.
 - **Review**: Inputs accept one hyphen-prefixed attribute per line. Existing populated lists are displayed and preserved; empty lists require at least one entry before save. Skip advances any song without saving, including songs the user only sampled.
 - **Persistence**: Save upserts both arrays using the user/name/artist key. Spotify play timestamps are used only to select the day's queue and are not stored.
 - **Discovery search**: `medley.search_my_songs` searches song names, credited artists, and both attribute arrays using the caller's authenticated identity and row-level security; see `feature_files/song_discovery.md` for recommendation behavior.
@@ -36,3 +37,4 @@ HACKING
 - 2026-11-04: Added the missing `medley.songs` migration after tracing the collection endpoint's uncaught lookup failure to the absent table definition in this worktree.
 - 2026-11-04: Made skip available for every daily song and documented that repeated plays collapse by exact track name and credited artist into one review form.
 - 2026-11-04: Added the authenticated keyword search interface used by discovery while preserving the existing saved-song ownership model.
+- 2026-11-05: Kept durable song attributes separate from the daily notes and play-count ranking added by the daily reflection feature.

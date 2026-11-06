@@ -423,6 +423,10 @@ h1 {
   outline-offset: 1px;
 }
 
+.moment-textarea {
+  min-height: 4rem;
+}
+
 .collection-actions {
   justify-content: flex-start;
   margin-top: 1.15rem;

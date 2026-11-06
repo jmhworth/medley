@@ -100,11 +100,15 @@ export async function getAccessToken() {
     headers: { "Content-Type": "application/x-www-form-urlencoded" },
     body,
   });
+  if (!res.ok) {
+    return null;
+  }
+
   const data = await res.json();
 
   // HACKING: return refreshed access token for this request only.
   // Skipping cookie writes keeps this safe to call from Server Components.
-  return data.access_token as string;
+  return typeof data.access_token === "string" ? data.access_token : null;
 }
 
 export async function exchangeCodeForTokens(code: string, codeVerifier: string) {

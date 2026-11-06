@@ -83,6 +83,7 @@ export async function listRecentlyPlayed(start: string, end: string) {
     headers: { Authorization: `Bearer ${token}` },
     cache: "no-store",
   });
+  if (res.status === 401) throw new Error("spotify_session_missing");
   if (!res.ok) throw new Error(`Spotify recently played request failed: ${res.status}`);
   const data = await res.json();
 

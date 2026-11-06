@@ -11,11 +11,12 @@ Connects a Spotify account via Authorization Code + PKCE (Client ID + Redirect U
 - **Recent plays**: `GET /v1/me/player/recently-played?limit=50` provides track ID, name, credited artists, and `played_at` for the 24-hour feedback queue. Plays are not persisted as history; Spotify omits skipped tracks and listening duration.
 - **Playback**: Resolves saved songs through Spotify search using normalized title and credited-artist matching, then sends the URI to `PUT /v1/me/player/play`; Spotify Premium and an active device may be required.
 - **Playback**: Playlist tracks play by Spotify ID; saved song recommendations continue to be checked against the user's Medley library before playback.
+- **Playback recovery**: If a play request has no Spotify token cookies, the listening workflow explains that Spotify must be reconnected and links directly to the OAuth flow.
 - **UI**: The home page delegates its Library + Search, Feedback, and Play + Feedback tabs to the listening workflow. Connect / Disconnect controls remain available.
 
 ## Relevant Files
 - `src/app/page.tsx`: Home discovery entry (auth gate + discovery and daily collection).
-- `src/app/listening-workspace.tsx`: Three-tab listening workflow and selected-track state.
+- `src/app/listening-workspace.tsx`: Three-tab listening workflow, selected-track state, and reconnect prompt for missing Spotify sessions.
 - `src/app/playlist-browser.tsx`: Client accordion for playlists and on-demand tracks.
 - `src/lib/spotify/params.ts`: Reads `playlist_limit` / `tracks_limit` from the parameter file.
 - `src/lib/spotify/auth.ts`: PKCE helpers, cookie token read/refresh.
@@ -45,3 +46,4 @@ HACKING
 - 2026-11-05: Made Spotify search matching insensitive to accents, punctuation, whitespace, and artist order while retaining exact title and full artist-list matching.
 - 2026-11-05: Added Spotify-ID playlist playback and connected the three-tab listening workflow to the shared Spotify client.
 - 2026-11-06: Fail fast when the recently played client has no Spotify access token so the collection route can prompt the user to connect Spotify.
+- 2026-11-05: Added a clear reconnect prompt when playback returns a missing Spotify session.

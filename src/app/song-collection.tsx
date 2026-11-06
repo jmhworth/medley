@@ -48,6 +48,12 @@ export function SongCollection() {
       if (response.status === 403) {
         throw new Error("Spotify needs updated permission to read recent plays.");
       }
+      if (response.status === 401) {
+        const data = await response.json();
+        if (data.error === "spotify_connection_required") {
+          throw new Error("Connect Spotify to load recent plays.");
+        }
+      }
       if (!response.ok) throw new Error("Could not load recent plays.");
       const data = await response.json();
       setSongs(data.songs ?? []);
@@ -140,6 +146,15 @@ export function SongCollection() {
                 Disconnect Spotify
               </a>
               {" and reconnect to grant access."}
+            </>
+          )}
+          {error.includes("Connect Spotify") && (
+            <>
+              {" "}
+              <a className="inline-link" href="/api/spotify/login">
+                Connect Spotify
+              </a>
+              .
             </>
           )}
         </p>

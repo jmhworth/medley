@@ -38,3 +38,4 @@ HACKING
 - 2026-11-04: Made skip available for every daily song and documented that repeated plays collapse by exact track name and credited artist into one review form.
 - 2026-11-04: Added the authenticated keyword search interface used by discovery while preserving the existing saved-song ownership model.
 - 2026-11-05: Kept durable song attributes separate from the daily notes and play-count ranking added by the daily reflection feature.
+- 2026-11-06: Return a clear reconnect prompt when recent-play requests lack a Spotify token instead of forwarding an empty bearer token and reporting a generic gateway error.

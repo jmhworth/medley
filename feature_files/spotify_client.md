@@ -44,3 +44,4 @@ HACKING
 - 2026-11-04: Added playback scope and saved-song playback API support for discovery recommendations.
 - 2026-11-05: Made Spotify search matching insensitive to accents, punctuation, whitespace, and artist order while retaining exact title and full artist-list matching.
 - 2026-11-05: Added Spotify-ID playlist playback and connected the three-tab listening workflow to the shared Spotify client.
+- 2026-11-06: Fail fast when the recently played client has no Spotify access token so the collection route can prompt the user to connect Spotify.

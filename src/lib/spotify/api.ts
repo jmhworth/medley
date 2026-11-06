@@ -75,6 +75,7 @@ export async function listPlaylistTracks(playlistId: string) {
 
 export async function listRecentlyPlayed(start: string, end: string) {
   const token = await getAccessToken();
+  if (!token) throw new Error("spotify_session_missing");
   const tracks: RecentlyPlayedTrack[] = [];
   const url = `https://api.spotify.com/v1/me/player/recently-played?limit=50&after=${new Date(start).getTime() - 1}`;
 

@@ -19,6 +19,12 @@ export async function GET(request: Request) {
   try {
     played = await listRecentlyPlayed(start, end);
   } catch (error) {
+    if (error instanceof Error && error.message === "spotify_session_missing") {
+      return NextResponse.json(
+        { error: "spotify_connection_required" },
+        { status: 401 },
+      );
+    }
     const status =
       error instanceof Error && error.message.includes(": 403") ? 403 : 502;
     return NextResponse.json(

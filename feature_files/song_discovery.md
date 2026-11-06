@@ -1,13 +1,14 @@
 # Song Discovery
 
 ## Summary
-Song discovery turns a listener's free-form mood or activity request into up to three recommendations drawn only from their saved `medley.songs`. An authenticated Next.js route coordinates Google AI Studio Gemini function calls, keyword search through the user's Supabase session, and a bounded in-memory recommendation list; the client keeps results only for the current page session and can play a recommendation through Spotify.
+Song discovery turns a listener's free-form mood or activity request into up to three recommendations drawn only from their saved `medley.songs`. An authenticated Next.js route coordinates Google AI Studio Gemini function calls, keyword search through the user's Supabase session, and a bounded in-memory recommendation list; recommendations stream to the client one at a time so the listener can start before discovery finishes.
 
 ## Key Points
 - **Search limits**: Gemini must call the search tool with at least three distinct keywords and can search at most six per request; the server tracks and enforces distinct keyword count.
 - **Query tracking**: Each completed AI keyword search is logged in the server developer console with its keyword and result count, making search effectiveness visible without logging song records.
 - **Grounded results**: Search tool results are user-scoped saved songs. The save tool accepts only IDs returned by searches and caps recommendations at three.
 - **Session lifetime**: Recommendations are held in client state and disappear when the page is refreshed.
+- **Progressive loading**: The discovery route streams each selected recommendation as newline-delimited JSON; the client appends it to the visible list and listening queue while the route searches for later recommendations.
 - **Similar discovery**: After starting playback, the user can request similar songs; the played song and its musical and personal attributes seed the same search flow.
 - **Credentials and models**: `GOOGLE_AI_STUDIO_API_KEY` is server-only and configured through the ignored environment file. The sibling parameter file orders Google AI models: Gemini 3.8 Flash, Gemini 3.5 Flash-Lite, then Gemma 4 models. HTTP 503 high-demand responses advance to the next configured model, and the request stops only after the configured model list is exhausted or another non-fallback error occurs.
 - **Provider failures**: Google AI Studio rejection status and a bounded response body are logged in the Next.js server terminal; the discovery panel directs users there for diagnosis.
@@ -16,6 +17,7 @@ Song discovery turns a listener's free-form mood or activity request into up to 
 
 ## Relevant Files
 - `src/app/song-discovery.tsx`: Prompt, recommendation list, play action, and similar-song action.
+- `src/app/listening-workspace.tsx`: Keeps discovery mounted during playback and extends the search queue as streamed recommendations arrive.
 - `src/app/api/songs/discover/route.ts`: Gemini tool workflow and server-side search/recommendation limits.
 - `src/app/api/spotify/play/route.ts`: Authenticated saved-song playback endpoint.
 - `src/lib/songs/discovery-params.ts`: Discovery parameter reader.
@@ -38,3 +40,4 @@ HACKING
 - 2026-11-04: Logged each AI library search keyword and its match count in the developer console for query effectiveness tracking.
 - 2026-11-04: Added 503 high-demand responses to the model fallback statuses so song discovery tries each configured model before returning a provider failure.
 - 2026-11-05: Improved recommendation playback matching and surfaced Spotify track lookup failures with a targeted message.
+- 2026-11-05: Streamed discovery recommendations individually so playback can begin while later recommendations continue loading into the queue.

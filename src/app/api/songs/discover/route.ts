@@ -19,7 +19,7 @@ const toolDeclarations = [
   },
   {
     name: "save_recommendations",
-    description: "Select up to three fitting songs from the songs returned by search_song_library and save them to the recommendation list.",
+    description: "Select one fitting song from the songs returned by search_song_library and add it to the recommendation list.",
     parameters: {
       type: "OBJECT",
       properties: {
@@ -60,18 +60,23 @@ export async function POST(request: Request) {
   const searches = new Set<string>();
   const library = new Map<string, ToolSong>();
   const recommendations: Recommendation[] = [];
+  const encoder = new TextEncoder();
   const instructions = [
     "You recommend songs only from the user's saved Medley library.",
     `Search at least ${params.minimumKeywordSearches} different keywords before saving recommendations, and never search more than ${params.maximumKeywordSearches} different keywords.`,
     "Choose a varied set of useful search terms inferred from the request. Continue searching if results are sparse.",
-    `Save up to ${params.recommendationLimit} songs using save_recommendations. Only use song_id values returned by search_song_library.`,
+    `Save up to ${params.recommendationLimit} songs using save_recommendations, one song at a time so each can be delivered immediately. Only use song_id values returned by search_song_library.`,
     "If there are no fitting songs, search more terms and save an empty list. Do not invent songs.",
     seed ? `A song was just played from Medley: ${seed}. Find songs with related emotional and musical qualities, guided by the user's request: ${prompt}` : `User request: ${prompt}`,
   ].join(" ");
   const contents: object[] = [{ role: "user", parts: [{ text: instructions }] }];
   let finalText = "";
 
-  for (let turn = 0; turn < params.maximumKeywordSearches + 3; turn += 1) {
+  const stream = new ReadableStream({
+    async start(controller) {
+      const send = (event: object) => controller.enqueue(encoder.encode(`${JSON.stringify(event)}\n`));
+      try {
+        for (let turn = 0; turn < params.maximumKeywordSearches + 3; turn += 1) {
     const allowedFunctionNames = searches.size >= params.maximumKeywordSearches
       ? ["save_recommendations"]
       : searches.size < params.minimumKeywordSearches
@@ -101,7 +106,8 @@ export async function POST(request: Request) {
         status: response?.status ?? 500,
         body: providerError.slice(0, 1000),
       });
-      return NextResponse.json({ error: "recommendation_service_failed" }, { status: 502 });
+          send({ type: "error", error: "recommendation_service_failed" });
+          break;
     }
 
     const data = await response.json();
@@ -131,7 +137,8 @@ export async function POST(request: Request) {
           matches = await searchSongsByKeyword(keyword);
         } catch (error) {
           console.error("Failed to search saved songs", error);
-          return NextResponse.json({ error: "song_search_failed" }, { status: 500 });
+              send({ type: "error", error: "song_search_failed" });
+              return;
         }
         console.info("AI song library query", { keyword, resultCount: matches.length });
         const results = matches.map((song) => {
@@ -148,19 +155,30 @@ export async function POST(request: Request) {
         }
         const requested = Array.isArray(call.args?.recommendations) ? call.args.recommendations : [];
         const remainingSlots = params.recommendationLimit - recommendations.length;
-        for (const item of requested.slice(0, remainingSlots)) {
+        for (const item of requested.slice(0, Math.min(1, remainingSlots))) {
           const song = library.get(String(item.song_id));
           if (song && !recommendations.some((recommendation) => recommendation.song.name === song.name && recommendation.song.artist === song.artist)) {
             const { id: _id, ...savedSong } = song;
-            recommendations.push({ song: savedSong, reason: String(item.reason ?? "") });
+            const recommendation = { song: savedSong, reason: String(item.reason ?? "") };
+            recommendations.push(recommendation);
+            send({ type: "recommendation", recommendation });
           }
         }
         functionResponses.push({ functionResponse: { name: call.name, response: { saved_count: recommendations.length } } });
       }
     }
     contents.push({ role: "user", parts: functionResponses });
-    if (recommendations.length) break;
-  }
+          if (recommendations.length >= params.recommendationLimit) break;
+        }
+        send({ type: "complete", searches: [...searches], message: finalText });
+      } catch (error) {
+        console.error("Song discovery stream failed", error);
+        send({ type: "error", error: "recommendation_service_failed" });
+      } finally {
+        controller.close();
+      }
+    },
+  });
 
-  return NextResponse.json({ recommendations, searches: [...searches], message: finalText });
+  return new Response(stream, { headers: { "Content-Type": "application/x-ndjson; charset=utf-8", "Cache-Control": "no-cache, no-transform" } });
 }

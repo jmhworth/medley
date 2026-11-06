@@ -5,9 +5,10 @@ import type { SpotifyPlaylist, SpotifyTrack } from "@/lib/spotify/api";
 
 type PlaylistBrowserProps = {
   playlists: SpotifyPlaylist[];
+  onSelectTrack?: (track: SpotifyTrack, tracks: SpotifyTrack[]) => void;
 };
 
-export function PlaylistBrowser({ playlists }: PlaylistBrowserProps) {
+export function PlaylistBrowser({ playlists, onSelectTrack }: PlaylistBrowserProps) {
   const [tracksById, setTracksById] = useState<Record<string, SpotifyTrack[]>>(
     {},
   );
@@ -84,6 +85,7 @@ export function PlaylistBrowser({ playlists }: PlaylistBrowserProps) {
                             <span className="song-title">{track.name}</span>
                             <span className="track-artists">{track.artists}</span>
                           </div>
+                          {onSelectTrack && <button className="ghost-link" type="button" onClick={() => onSelectTrack(track, tracks)}>Play</button>}
                         </li>
                       ))}
                     </ol>

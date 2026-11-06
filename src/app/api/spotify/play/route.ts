@@ -1,5 +1,5 @@
 import { NextResponse } from "next/server";
-import { playSavedSong } from "@/lib/spotify/api";
+import { playSavedSong, playSpotifyTrack } from "@/lib/spotify/api";
 import { getSongsForKeys } from "@/lib/songs/db";
 import { getMedleyUser } from "@/lib/supabase/auth";
 
@@ -8,17 +8,21 @@ export async function POST(request: Request) {
   if (!user) return NextResponse.json({ error: "unauthorized" }, { status: 401 });
 
   const body = await request.json();
+  const spotifyId = typeof body.spotifyId === "string" ? body.spotifyId : "";
   const name = typeof body.name === "string" ? body.name.trim() : "";
   const artist = typeof body.artist === "string" ? body.artist.trim() : "";
-  if (!name || !artist) return NextResponse.json({ error: "song_required" }, { status: 400 });
+  if (!spotifyId && (!name || !artist)) return NextResponse.json({ error: "song_required" }, { status: 400 });
 
-  const savedSongs = await getSongsForKeys([{ name, artist }]);
-  if (!savedSongs.some((song) => song.name === name && song.artist === artist)) {
-    return NextResponse.json({ error: "song_not_saved" }, { status: 404 });
+  if (!spotifyId) {
+    const savedSongs = await getSongsForKeys([{ name, artist }]);
+    if (!savedSongs.some((song) => song.name === name && song.artist === artist)) {
+      return NextResponse.json({ error: "song_not_saved" }, { status: 404 });
+    }
   }
 
   try {
-    await playSavedSong(name, artist);
+    if (spotifyId) await playSpotifyTrack(spotifyId);
+    else await playSavedSong(name, artist);
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "spotify_play_failed";

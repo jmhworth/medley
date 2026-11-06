@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { SongAttributeFeedback } from "./song-attribute-feedback";
 
 type CollectionSong = {
   name: string;
@@ -8,19 +9,13 @@ type CollectionSong = {
   musical_attributes: string[];
   personal_attributes: string[];
   play_count: number;
-  moment_note: string;
 };
 
 function localDayRange() {
   const today = new Date();
-  const start = new Date(today.getFullYear(), today.getMonth(), today.getDate());
-  const end = new Date(today.getFullYear(), today.getMonth(), today.getDate() + 1);
-  const day = [
-    today.getFullYear(),
-    String(today.getMonth() + 1).padStart(2, "0"),
-    String(today.getDate()).padStart(2, "0"),
-  ].join("-");
-  return { start: start.toISOString(), end: end.toISOString(), day };
+  const end = today;
+  const start = new Date(today.getTime() - 24 * 60 * 60 * 1000);
+  return { start: start.toISOString(), end: end.toISOString() };
 }
 
 function parseBullets(value: string) {
@@ -36,39 +31,35 @@ export function SongCollection() {
   const [currentIndex, setCurrentIndex] = useState(0);
   const [musicalText, setMusicalText] = useState("");
   const [personalText, setPersonalText] = useState("");
-  const [momentText, setMomentText] = useState("");
   const [loading, setLoading] = useState(false);
   const [saving, setSaving] = useState(false);
   const [started, setStarted] = useState(false);
-  const [collectionDay, setCollectionDay] = useState("");
   const [error, setError] = useState("");
   const current = songs[currentIndex];
 
   async function startCollection() {
     setLoading(true);
     setError("");
-    const { start, end, day } = localDayRange();
+    const { start, end } = localDayRange();
     try {
       const response = await fetch(
-        `/api/songs/collection?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}&day=${encodeURIComponent(day)}`,
+        `/api/songs/collection?start=${encodeURIComponent(start)}&end=${encodeURIComponent(end)}`,
       );
       if (response.status === 403) {
         throw new Error("Spotify needs updated permission to read recent plays.");
       }
-      if (!response.ok) throw new Error("Could not load today's plays.");
+      if (!response.ok) throw new Error("Could not load recent plays.");
       const data = await response.json();
       setSongs(data.songs ?? []);
-      setCollectionDay(day);
       setCurrentIndex(0);
       setStarted(true);
       setMusicalText("");
       setPersonalText("");
-      setMomentText(data.songs?.[0]?.moment_note ?? "");
     } catch (collectionError) {
       setError(
         collectionError instanceof Error
           ? collectionError.message
-          : "Could not load today's plays.",
+          : "Could not load recent plays.",
       );
     } finally {
       setLoading(false);
@@ -80,20 +71,14 @@ export function SongCollection() {
     setCurrentIndex(nextIndex);
     setMusicalText("");
     setPersonalText("");
-    setMomentText(songs[nextIndex]?.moment_note ?? "");
   }
 
   async function saveAndAdvance() {
     if (!current) return;
-    const musical = current.musical_attributes.length
-      ? current.musical_attributes
-      : parseBullets(musicalText);
-    const personal = current.personal_attributes.length
-      ? current.personal_attributes
-      : parseBullets(personalText);
+    const musical = [...current.musical_attributes, ...parseBullets(musicalText)];
+    const personal = [...current.personal_attributes, ...parseBullets(personalText)];
     const hasSongAttributes = musical.length > 0 && personal.length > 0;
-    const hasMoment = Boolean(momentText.trim() || current.moment_note);
-    if (!hasSongAttributes && !hasMoment) {
+    if (!hasSongAttributes) {
       setError("Add at least one bullet to each empty list before saving.");
       return;
     }
@@ -114,22 +99,6 @@ export function SongCollection() {
         });
         if (!response.ok) throw new Error("Could not save this song.");
       }
-      if (hasMoment) {
-        const momentResponse = await fetch("/api/songs/moment", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            name: current.name,
-            artist: current.artist,
-            day: collectionDay,
-            note: momentText.trim(),
-            play_count: current.play_count,
-          }),
-        });
-        if (!momentResponse.ok) {
-          throw new Error("Song saved, but could not save your note about today.");
-        }
-      }
       advance();
     } catch (saveError) {
       setError(saveError instanceof Error ? saveError.message : "Could not save this song.");
@@ -147,9 +116,9 @@ export function SongCollection() {
       <div className="collection-heading-row">
         <div>
           <p className="eyebrow">Song data</p>
-          <h2 id="collection-heading">Daily collection</h2>
+          <h2 id="collection-heading">Recent listening</h2>
           <p className="collection-copy">
-            Review songs you played today and add what you notice.
+            Review your 50 most recent Spotify plays from the past 24 hours, ranked by play frequency.
           </p>
         </div>
         <button
@@ -176,7 +145,7 @@ export function SongCollection() {
         </p>
       )}
       {!started ? null : songs.length === 0 ? (
-        <p className="collection-copy">No Spotify plays found for today.</p>
+        <p className="collection-copy">No Spotify plays found in the past 24 hours.</p>
       ) : !current ? (
         <p className="collection-copy">All {songs.length} songs reviewed.</p>
       ) : (
@@ -187,63 +156,10 @@ export function SongCollection() {
           <h3>{current.name}</h3>
           <p className="track-artists">{current.artist}</p>
           <p className="collection-copy">
-            Played {current.play_count} {current.play_count === 1 ? "time" : "times"} today
+            Played {current.play_count} {current.play_count === 1 ? "time" : "times"} in the recent play window
           </p>
 
-          <div className="attribute-section">
-            <h4>What made this song so good today?</h4>
-            <label className="collection-label">
-              Capture what stood out in this moment. Save and next stores this note.
-              <textarea
-                className="collection-textarea moment-textarea"
-                value={momentText}
-                onChange={(event) => setMomentText(event.target.value)}
-                placeholder="What did you notice or feel when it came on?"
-              />
-            </label>
-          </div>
-
-          <div className="attribute-section">
-            <h4>Musical attributes</h4>
-            {current.musical_attributes.length ? (
-              <ul>
-                {current.musical_attributes.map((item, index) => (
-                  <li key={`${item}-${index}`}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <label className="collection-label">
-                Enter one bullet per line
-                <textarea
-                  className="collection-textarea"
-                  value={musicalText}
-                  onChange={(event) => setMusicalText(event.target.value)}
-                  placeholder={"- bright synths\n- steady rhythm"}
-                />
-              </label>
-            )}
-          </div>
-
-          <div className="attribute-section">
-            <h4>Personal attributes</h4>
-            {current.personal_attributes.length ? (
-              <ul>
-                {current.personal_attributes.map((item, index) => (
-                  <li key={`${item}-${index}`}>{item}</li>
-                ))}
-              </ul>
-            ) : (
-              <label className="collection-label">
-                Enter one bullet per line
-                <textarea
-                  className="collection-textarea"
-                  value={personalText}
-                  onChange={(event) => setPersonalText(event.target.value)}
-                  placeholder={"- reminds me of summer\n- good for a walk"}
-                />
-              </label>
-            )}
-          </div>
+          <SongAttributeFeedback musicalAttributes={current.musical_attributes} personalAttributes={current.personal_attributes} musicalText={musicalText} personalText={personalText} onMusicalTextChange={setMusicalText} onPersonalTextChange={setPersonalText} />
 
           <div className="collection-actions">
             <button

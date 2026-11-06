@@ -14,6 +14,7 @@ export type SpotifyTrack = {
 };
 
 export type RecentlyPlayedTrack = {
+  id: string;
   name: string;
   artists: string;
   playedAt: string;
@@ -75,30 +76,26 @@ export async function listPlaylistTracks(playlistId: string) {
 export async function listRecentlyPlayed(start: string, end: string) {
   const token = await getAccessToken();
   const tracks: RecentlyPlayedTrack[] = [];
-  let url: string | null =
-    `https://api.spotify.com/v1/me/player/recently-played?limit=50&after=${new Date(start).getTime() - 1}`;
+  const url = `https://api.spotify.com/v1/me/player/recently-played?limit=50&after=${new Date(start).getTime() - 1}`;
 
-  while (url) {
-    const res = await fetch(url, {
-      headers: { Authorization: `Bearer ${token}` },
-      cache: "no-store",
+  const res = await fetch(url, {
+    headers: { Authorization: `Bearer ${token}` },
+    cache: "no-store",
+  });
+  if (!res.ok) throw new Error(`Spotify recently played request failed: ${res.status}`);
+  const data = await res.json();
+
+  for (const item of data.items ?? []) {
+    const track = item.track;
+    if (!track || track.type !== "track") continue;
+    if (item.played_at < start || item.played_at >= end) continue;
+
+    tracks.push({
+      id: track.id,
+      name: track.name,
+      artists: (track.artists ?? []).map((artist: { name: string }) => artist.name).join(", "),
+      playedAt: item.played_at,
     });
-    if (!res.ok) throw new Error(`Spotify recently played request failed: ${res.status}`);
-    const data = await res.json();
-
-    for (const item of data.items ?? []) {
-      const track = item.track;
-      if (!track || track.type !== "track") continue;
-      if (item.played_at < start || item.played_at >= end) continue;
-
-      tracks.push({
-        name: track.name,
-        artists: (track.artists ?? []).map((artist: { name: string }) => artist.name).join(", "),
-        playedAt: item.played_at,
-      });
-    }
-
-    url = data.next;
   }
 
   return tracks;
@@ -145,4 +142,15 @@ export async function playSavedSong(name: string, artist: string) {
     body: JSON.stringify({ uris: [track.uri] }),
   });
   if (!playResponse.ok) throw new Error(`spotify_play_failed:${playResponse.status}`);
+}
+
+export async function playSpotifyTrack(id: string) {
+  const token = await getAccessToken();
+  if (!token) throw new Error("spotify_session_missing");
+  const response = await fetch("https://api.spotify.com/v1/me/player/play", {
+    method: "PUT",
+    headers: { Authorization: `Bearer ${token}`, "Content-Type": "application/json" },
+    body: JSON.stringify({ uris: [`spotify:track:${id}`] }),
+  });
+  if (!response.ok) throw new Error(`spotify_play_failed:${response.status}`);
 }

@@ -3,6 +3,7 @@
 import { FormEvent, KeyboardEvent, useState } from "react";
 
 type Recommendation = {
+  spotify_id?: string;
   song: {
     name: string;
     artist: string;
@@ -12,7 +13,7 @@ type Recommendation = {
   reason: string;
 };
 
-export function SongDiscovery() {
+export function SongDiscovery({ onSelectSong }: { onSelectSong?: (song: Recommendation["song"], spotifyId?: string, songs?: Recommendation["song"][]) => void }) {
   const [prompt, setPrompt] = useState("");
   const [seed, setSeed] = useState("");
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
@@ -54,6 +55,10 @@ export function SongDiscovery() {
   }
 
   async function play(song: Recommendation["song"]) {
+    if (onSelectSong) {
+      onSelectSong(song, undefined, recommendations.map((item) => item.song));
+      return;
+    }
     const key = `${song.name}-${song.artist}`;
     setPlaying(key);
     setError("");

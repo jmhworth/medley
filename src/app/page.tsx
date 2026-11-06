@@ -1,8 +1,7 @@
 import Link from "next/link";
 import { getMedleyUser } from "@/lib/supabase/auth";
 import { hasSpotifySession } from "@/lib/spotify/auth";
-import { SongCollection } from "./song-collection";
-import { SongDiscovery } from "./song-discovery";
+import { ListeningWorkspace } from "./listening-workspace";
 
 type HomeProps = {
   searchParams: Promise<{
@@ -73,8 +72,7 @@ export default async function Home({ searchParams }: HomeProps) {
         </Link>
       </header>
 
-      <SongDiscovery />
-      <SongCollection />
+      <ListeningWorkspace />
     </main>
   );
 }

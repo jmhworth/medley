@@ -50,6 +50,7 @@ export function AuthForm({
         password,
       });
       if (error) {
+        console.error("Supabase sign-in failed", error);
         setMessage(error.message);
         return;
       }
@@ -59,6 +60,7 @@ export function AuthForm({
         password,
       });
       if (error) {
+        console.error("Supabase sign-up failed", error);
         setMessage(error.message);
         return;
       }

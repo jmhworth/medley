@@ -9,16 +9,20 @@ export async function POST(request: Request) {
   }
 
   const moment = await request.json();
-  const saved = await saveSongMoment(
-    {
-      name: moment.name,
-      artist: moment.artist,
-      day: moment.day,
-      note: moment.note,
-      play_count: moment.play_count,
-    },
-    user.id,
-  );
-
-  return NextResponse.json({ moment: saved });
+  try {
+    const saved = await saveSongMoment(
+      {
+        name: moment.name,
+        artist: moment.artist,
+        day: moment.day,
+        note: moment.note,
+        play_count: moment.play_count,
+      },
+      user.id,
+    );
+    return NextResponse.json({ moment: saved });
+  } catch (error) {
+    console.error("Failed to save song listening note", error);
+    return NextResponse.json({ error: "song_moment_save_failed" }, { status: 500 });
+  }
 }

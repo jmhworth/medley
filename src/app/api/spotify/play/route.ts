@@ -25,6 +25,7 @@ export async function POST(request: Request) {
     else await playSavedSong(name, artist);
     return NextResponse.json({ ok: true });
   } catch (error) {
+    console.error("Spotify playback failed", error);
     const message = error instanceof Error ? error.message : "spotify_play_failed";
     const status = message === "spotify_session_missing"
       ? 401

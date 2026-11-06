@@ -20,7 +20,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.redirect(getSpotifyAppUrl("/", request.url));
   }
 
-  const data = await exchangeCodeForTokens(code, verifier);
+  let data;
+  try {
+    data = await exchangeCodeForTokens(code, verifier);
+  } catch (error) {
+    console.error("Spotify OAuth token exchange failed", error);
+    return NextResponse.redirect(getSpotifyAppUrl("/", request.url));
+  }
   const access = data.access_token as string;
   const refresh = data.refresh_token as string;
   const expiresIn = Number(data.expires_in ?? 3600);

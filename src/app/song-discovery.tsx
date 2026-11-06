@@ -48,6 +48,7 @@ export function SongDiscovery({ onSelectSong }: { onSelectSong?: (song: Recommen
       }
       setRecommendations(data.recommendations ?? []);
     } catch (discoverError) {
+      console.error("Song discovery request failed", discoverError);
       setError(discoverError instanceof Error ? discoverError.message : "Could not find recommendations.");
     } finally {
       setLoading(false);
@@ -79,6 +80,7 @@ export function SongDiscovery({ onSelectSong }: { onSelectSong?: (song: Recommen
       setLastPlayed(`${song.name} by ${song.artist}`);
       setSeed(`${song.name} by ${song.artist}; musical qualities: ${song.musical_attributes.join(", ")}; personal qualities: ${song.personal_attributes.join(", ")}`);
     } catch (playError) {
+      console.error("Song playback request failed", playError);
       setError(playError instanceof Error ? playError.message : "Could not start playback.");
     } finally {
       setPlaying("");

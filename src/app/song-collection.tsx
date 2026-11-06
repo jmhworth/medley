@@ -62,6 +62,7 @@ export function SongCollection() {
       setMusicalText("");
       setPersonalText("");
     } catch (collectionError) {
+      console.error("Failed to load song collection", collectionError);
       setError(
         collectionError instanceof Error
           ? collectionError.message
@@ -107,6 +108,7 @@ export function SongCollection() {
       }
       advance();
     } catch (saveError) {
+      console.error("Failed to save song attributes", saveError);
       setError(saveError instanceof Error ? saveError.message : "Could not save this song.");
     } finally {
       setSaving(false);

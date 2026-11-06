@@ -29,7 +29,8 @@ export function PlaylistBrowser({ playlists, onSelectTrack }: PlaylistBrowserPro
 
       const data = await res.json();
       setTracksById((prev) => ({ ...prev, [playlist.id]: data.tracks ?? [] }));
-    } catch {
+    } catch (error) {
+      console.error("Failed to load Spotify playlist tracks", error);
       setErrorId(playlist.id);
     } finally {
       setLoadingId(null);

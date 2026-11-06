@@ -6,6 +6,11 @@ export async function GET(
   context: { params: Promise<{ id: string }> },
 ) {
   const { id } = await context.params;
-  const tracks = await listPlaylistTracks(id);
-  return NextResponse.json({ tracks });
+  try {
+    const tracks = await listPlaylistTracks(id);
+    return NextResponse.json({ tracks });
+  } catch (error) {
+    console.error("Failed to load Spotify playlist tracks", error);
+    return NextResponse.json({ error: "spotify_request_failed" }, { status: 502 });
+  }
 }

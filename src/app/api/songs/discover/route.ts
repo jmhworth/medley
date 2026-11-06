@@ -126,7 +126,13 @@ export async function POST(request: Request) {
           continue;
         }
         searches.add(keyword);
-        const matches = await searchSongsByKeyword(keyword);
+        let matches: Song[];
+        try {
+          matches = await searchSongsByKeyword(keyword);
+        } catch (error) {
+          console.error("Failed to search saved songs", error);
+          return NextResponse.json({ error: "song_search_failed" }, { status: 500 });
+        }
         console.info("AI song library query", { keyword, resultCount: matches.length });
         const results = matches.map((song) => {
           const id = `song_${library.size + 1}`;

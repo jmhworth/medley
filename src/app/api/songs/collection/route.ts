@@ -25,6 +25,7 @@ export async function GET(request: Request) {
         { status: 401 },
       );
     }
+    console.error("Failed to fetch Spotify listening history", error);
     const status =
       error instanceof Error && error.message.includes(": 403") ? 403 : 502;
     return NextResponse.json(
@@ -53,7 +54,13 @@ export async function GET(request: Request) {
   const keys = [...unique.values()].sort(
     (first, second) => second.play_count - first.play_count || second.last_played.localeCompare(first.last_played),
   );
-  const savedSongs = await getSongsForKeys(keys);
+  let savedSongs: Awaited<ReturnType<typeof getSongsForKeys>>;
+  try {
+    savedSongs = await getSongsForKeys(keys);
+  } catch (error) {
+    console.error("Failed to load saved songs for listening history", error);
+    return NextResponse.json({ error: "song_lookup_failed" }, { status: 500 });
+  }
   const songs = keys.map((key) => {
     const saved = savedSongs.find(
       (song) => song.name === key.name && song.artist === key.artist,

@@ -138,7 +138,14 @@ export async function POST(request: Request) {
 
   const candidate = data.candidates?.[0];
   const call = candidate?.content?.parts?.find((part: { functionCall?: unknown }) => part.functionCall)?.functionCall;
-  if (!call) return NextResponse.json({ searches, done: true });
+  if (!call) {
+    return NextResponse.json({
+      searches,
+      searchResults,
+      done: false,
+      feedback: "Choose a tool call for this discovery step. If recommending, use a song id exactly as shown in the search results.",
+    });
+  }
 
   if (call.name === "search_song_library") {
     const keyword = String(call.args?.keyword ?? "").trim().toLowerCase();
@@ -157,23 +164,33 @@ export async function POST(request: Request) {
       searches.push(keyword);
       return NextResponse.json({ searches, searchResults: [...library.values()], done: false });
     }
-    if (searches.length >= params.maximumKeywordSearches) return NextResponse.json({ searches, done: true });
-    return NextResponse.json({ searches, done: false, feedback: "That keyword was empty or already searched. Choose a new, distinct keyword." });
+    if (searches.length >= params.maximumKeywordSearches) return NextResponse.json({ searches, searchResults, done: true });
+    return NextResponse.json({ searches, searchResults, done: false, feedback: "That keyword was empty or already searched. Choose a new, distinct keyword." });
   }
 
   if (call.name === "recommend_song") {
-    const song = library.get(String(call.args?.song_id ?? ""));
-    if (!song) return NextResponse.json({ searches, done: true });
+    const songId = String(call.args?.song_id ?? "");
+    if (!songId) return NextResponse.json({ searches, searchResults, done: true });
+    const song = library.get(songId);
+    if (!song) {
+      return NextResponse.json({
+        searches,
+        searchResults,
+        done: false,
+        feedback: `The song id "${songId}" is not in the search results. Choose an exact id from the available saved songs.`,
+      });
+    }
     const repeated = previousRecommendations.some((item) => item.song.name.toLowerCase() === song.name.toLowerCase() && item.song.artist.toLowerCase() === song.artist.toLowerCase());
-    if (repeated) return NextResponse.json({ searches, done: previousRecommendations.length >= params.recommendationLimit });
+    if (repeated) return NextResponse.json({ searches, searchResults, done: previousRecommendations.length >= params.recommendationLimit });
     const { id: _id, ...savedSong } = song;
     const recommendation = { song: savedSong, reason: String(call.args?.reason ?? "") };
     return NextResponse.json({
       searches,
+      searchResults,
       recommendation,
       done: previousRecommendations.length + 1 >= params.recommendationLimit,
     });
   }
 
-  return NextResponse.json({ searches, done: true });
+  return NextResponse.json({ searches, searchResults, done: false, feedback: "Use one of the available discovery tools for this step." });
 }

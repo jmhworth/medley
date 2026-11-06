@@ -25,6 +25,7 @@ export function SongDiscovery({
   const [prompt, setPrompt] = useState("");
   const [seed, setSeed] = useState("");
   const [recommendations, setRecommendations] = useState<Recommendation[]>([]);
+  const [hasSearchResults, setHasSearchResults] = useState(false);
   const [loading, setLoading] = useState(false);
   const [playing, setPlaying] = useState("");
   const [lastPlayed, setLastPlayed] = useState("");
@@ -40,6 +41,7 @@ export function SongDiscovery({
     setLoading(true);
     setError("");
     setRecommendations([]);
+    setHasSearchResults(false);
     onRecommendations?.([]);
     try {
       let streamRecommendations: Recommendation[] = [];
@@ -65,6 +67,7 @@ export function SongDiscovery({
         }
         searches = data.searches ?? searches;
         searchResults = data.searchResults ?? searchResults;
+        setHasSearchResults(searchResults.length > 0);
         feedback = data.feedback ?? "";
         if (data.recommendation) {
           streamRecommendations = [...streamRecommendations, data.recommendation];
@@ -171,7 +174,9 @@ export function SongDiscovery({
         </div>
       )}
       {!loading && prompt && recommendations.length === 0 && !error && (
-        <p className="collection-copy">No saved songs matched this request.</p>
+        <p className="collection-copy">
+          {hasSearchResults ? "Found saved songs, but couldn't choose a recommendation. Try again." : "No saved songs matched this request."}
+        </p>
       )}
     </section>
   );

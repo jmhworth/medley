@@ -10,6 +10,7 @@ Song discovery turns a listener's free-form mood or activity request into up to 
 - **Session lifetime**: Recommendations are held in client state and disappear when the page is refreshed.
 - **Stepwise loading**: The client makes one route request per Gemini decision and appends each selected recommendation to the visible list and listening queue while it requests later recommendations.
 - **Context continuity**: Each step includes the original request, any played-song seed, completed search keywords, prior recommendations, and saved-song search results retained by the client so Gemini can choose useful next keywords and recommendations without the route repeating earlier database searches.
+- **Recoverable model choices**: Missing tool calls and invalid recommendation IDs keep accumulated search results and ask Gemini to correct its next decision; the panel distinguishes saved-song matches from a genuinely empty search.
 - **Similar discovery**: After starting playback, the user can request similar songs; the played song and its musical and personal attributes seed the same search flow.
 - **Credentials and models**: `GOOGLE_AI_STUDIO_API_KEY` is server-only and configured through the ignored environment file. The sibling parameter file orders Google AI models: Gemini 3.8 Flash, Gemini 3.5 Flash-Lite, then Gemma 4 models. HTTP 400, 404, 408, 503, and 504 responses and fetch-level failures advance to the next configured model; each attempt, including response-body parsing, has a configurable timeout so a stalled final response cannot consume the route's full duration.
 - **Provider failures**: Google AI Studio rejection status and a bounded response body are logged in the Next.js server terminal; the discovery panel directs users there for diagnosis.
@@ -51,3 +52,4 @@ HACKING
 - 2026-11-06: Typed transient discovery songs and recommendations without the database-only `user_id` field so the Vercel TypeScript build accepts the route's actual response shape.
 - 2026-11-06: Kept Gemini Flash models ahead of Gemma and continued through configured fallbacks when the provider returns timeout statuses or fetch fails.
 - 2026-11-06: Bounded each Gemini model attempt and kept response-body parsing inside fallback handling so a stalled final response can advance to another model before Vercel times out.
+- 2026-11-06: Preserved accumulated library results after invalid or missing Gemini tool calls, retried with corrective feedback, and clarified the empty state when matches existed but no recommendation was selected.

@@ -65,9 +65,11 @@ export function SongDiscovery() {
       });
       if (!response.ok) {
         const data = await response.json();
-        throw new Error(data.error?.includes("403")
-          ? "Spotify needs playback permission. Disconnect and reconnect Spotify."
-          : "Could not start playback. Check that Spotify Premium and an active playback device are available.");
+        throw new Error(data.error === "spotify_track_not_found"
+          ? "Spotify couldn't find this saved song. Try refreshing recommendations."
+          : data.error?.includes("403")
+            ? "Spotify needs playback permission. Disconnect and reconnect Spotify."
+            : "Could not start playback. Check that Spotify Premium and an active playback device are available.");
       }
       setLastPlayed(`${song.name} by ${song.artist}`);
       setSeed(`${song.name} by ${song.artist}; musical qualities: ${song.musical_attributes.join(", ")}; personal qualities: ${song.personal_attributes.join(", ")}`);

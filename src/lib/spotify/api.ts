@@ -120,11 +120,18 @@ export async function playSavedSong(name: string, artist: string) {
   if (!searchResponse.ok) throw new Error(`spotify_search_failed:${searchResponse.status}`);
   const searchData = await searchResponse.json();
   const tracks = searchData.tracks?.items ?? [];
-  const expectedName = name.toLowerCase();
-  const expectedArtist = artist.toLowerCase();
+  const normalize = (value: string) => value
+    .normalize("NFKD")
+    .replace(/\p{Diacritic}/gu, "")
+    .toLowerCase()
+    .replace(/[^\p{L}\p{N}]+/gu, " ")
+    .trim()
+    .replace(/\s+/g, " ");
+  const expectedName = normalize(name);
+  const expectedArtists = JSON.stringify(artist.split(",").map(normalize).sort());
   const track = tracks.find((candidate: { name: string; artists: { name: string }[] }) =>
-    candidate.name.toLowerCase() === expectedName &&
-    candidate.artists.map((item) => item.name).join(", ").toLowerCase() === expectedArtist,
+    normalize(candidate.name) === expectedName &&
+    JSON.stringify(candidate.artists.map((item) => normalize(item.name)).sort()) === expectedArtists,
   );
 
   if (!track?.uri) throw new Error("spotify_track_not_found");

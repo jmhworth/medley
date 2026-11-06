@@ -12,7 +12,7 @@ Song discovery turns a listener's free-form mood or activity request into up to 
 - **Credentials and models**: `GOOGLE_AI_STUDIO_API_KEY` is server-only and configured through the ignored environment file. The sibling parameter file orders Google AI models: Gemini 3.8 Flash, Gemini 3.5 Flash-Lite, then Gemma 4 models. HTTP 503 high-demand responses advance to the next configured model, and the request stops only after the configured model list is exhausted or another non-fallback error occurs.
 - **Provider failures**: Google AI Studio rejection status and a bounded response body are logged in the Next.js server terminal; the discovery panel directs users there for diagnosis.
 - **Database search**: `medley.search_my_songs` uses invoker permissions, the authenticated user ID, and the existing song table's row-level security.
-- **Playback**: The Spotify endpoint checks that the requested song is saved for the signed-in user before resolving and playing its Spotify track.
+- **Playback**: The Spotify endpoint checks that the requested song is saved for the signed-in user before resolving and playing its Spotify track; unmatched catalog results return a specific not-found error.
 
 ## Relevant Files
 - `src/app/song-discovery.tsx`: Prompt, recommendation list, play action, and similar-song action.
@@ -37,3 +37,4 @@ HACKING
 - 2026-11-04: Replaced the restricted Gemini 2.5 Flash setting with current Gemini Flash and Gemma 4 model fallbacks for function-calling requests.
 - 2026-11-04: Logged each AI library search keyword and its match count in the developer console for query effectiveness tracking.
 - 2026-11-04: Added 503 high-demand responses to the model fallback statuses so song discovery tries each configured model before returning a provider failure.
+- 2026-11-05: Improved recommendation playback matching and surfaced Spotify track lookup failures with a targeted message.

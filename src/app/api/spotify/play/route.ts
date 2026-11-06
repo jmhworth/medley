@@ -22,7 +22,13 @@ export async function POST(request: Request) {
     return NextResponse.json({ ok: true });
   } catch (error) {
     const message = error instanceof Error ? error.message : "spotify_play_failed";
-    const status = message === "spotify_session_missing" ? 401 : message.endsWith(":403") ? 403 : 502;
+    const status = message === "spotify_session_missing"
+      ? 401
+      : message === "spotify_track_not_found"
+        ? 404
+        : message.endsWith(":403")
+          ? 403
+          : 502;
     return NextResponse.json({ error: message }, { status });
   }
 }

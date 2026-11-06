@@ -9,7 +9,7 @@ Connects a Spotify account via Authorization Code + PKCE (Client ID + Redirect U
 - **Playlists**: `GET /v1/me/playlists` (owned + followed as Spotify returns them), paginated with `playlist_limit`.
 - **Tracks**: `GET /v1/playlists/{id}/tracks` on expand, paginated with `tracks_limit`. No Liked Songs endpoint in this slice.
 - **Recent plays**: `GET /v1/me/player/recently-played`, requested in pages of up to 50, provides track name, credited artists, and `played_at` for the local-day review queue. Plays are not persisted as history.
-- **Playback**: Resolves the saved song through Spotify search and sends its URI to `PUT /v1/me/player/play`; Spotify Premium and an active device may be required.
+- **Playback**: Resolves saved songs through Spotify search using normalized title and credited-artist matching, then sends the URI to `PUT /v1/me/player/play`; Spotify Premium and an active device may be required.
 - **UI**: The home page uses song discovery in place of the playlist list and keeps the daily song review queue; Connect / Disconnect controls remain available. Playlist routes are retained for existing callers.
 
 ## Relevant Files
@@ -39,3 +39,4 @@ HACKING
 - 2026-09-06: Changed playlist rows to native details disclosures so they open even when client hydration is unavailable, while preserving on-demand track loading and showing request failures in the expanded panel.
 - 2026-09-26: Added the recently played scope and paginated track lookup for the authenticated user's daily song collection queue.
 - 2026-11-04: Added playback scope and saved-song playback API support for discovery recommendations.
+- 2026-11-05: Made Spotify search matching insensitive to accents, punctuation, whitespace, and artist order while retaining exact title and full artist-list matching.

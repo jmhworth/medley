@@ -98,6 +98,7 @@ export async function POST(request: Request) {
 
   let response: Response | undefined;
   let providerError = "";
+  let data: any;
   for (const model of params.googleAiModels) {
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
     try {
@@ -111,15 +112,20 @@ export async function POST(request: Request) {
           toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames } },
         }),
         cache: "no-store",
+        signal: AbortSignal.timeout(params.googleAiRequestTimeoutMs),
       });
+      if (!response.ok) {
+        providerError = await response.text();
+        if ([400, 404, 408, 503, 504].includes(response.status)) continue;
+        break;
+      }
+      data = await response.json();
     } catch (error) {
       response = undefined;
       providerError = error instanceof Error ? error.message : String(error);
       continue;
     }
-    if (response.ok) break;
-    providerError = await response.text();
-    if (![400, 404, 408, 503, 504].includes(response.status)) break;
+    break;
   }
 
   if (!response || !response.ok) {
@@ -130,7 +136,6 @@ export async function POST(request: Request) {
     return NextResponse.json({ error: "recommendation_service_failed" }, { status: 502 });
   }
 
-  const data = await response.json();
   const candidate = data.candidates?.[0];
   const call = candidate?.content?.parts?.find((part: { functionCall?: unknown }) => part.functionCall)?.functionCall;
   if (!call) return NextResponse.json({ searches, done: true });

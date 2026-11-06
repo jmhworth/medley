@@ -7,5 +7,8 @@ maximum_keyword_searches = 6
 # Maximum number of songs returned to the discovery panel
 recommendation_limit = 3
 
+# Per-model timeout, keeping fallback attempts inside the route's 60-second limit
+google_ai_request_timeout_ms = 10000
+
 # Google AI Studio models tried in order for function calling
 google_ai_models = ["gemini-3.8-flash", "gemini-3.5-flash-lite", "gemma-4-31b-it", "gemma-4-26b-a4b-it"]

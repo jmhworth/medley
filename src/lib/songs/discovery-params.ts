@@ -8,6 +8,7 @@ export function loadDiscoveryParams() {
     minimumKeywordSearches: Number(raw.match(/minimum_keyword_searches\s*=\s*(\d+)/)?.[1] ?? 3),
     maximumKeywordSearches: Number(raw.match(/maximum_keyword_searches\s*=\s*(\d+)/)?.[1] ?? 6),
     recommendationLimit: Number(raw.match(/recommendation_limit\s*=\s*(\d+)/)?.[1] ?? 3),
+    googleAiRequestTimeoutMs: Number(raw.match(/google_ai_request_timeout_ms\s*=\s*(\d+)/)?.[1] ?? 10000),
     googleAiModels: raw.match(/google_ai_models\s*=\s*\[([^\]]+)\]/)?.[1]
       .split(",")
       .map((model) => model.trim().replace(/^"|"$/g, ""))

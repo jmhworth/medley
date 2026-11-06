@@ -54,17 +54,20 @@ export async function POST(request: Request) {
     : [];
 
   const library = new Map<string, ToolSong>();
-  try {
-    for (const keyword of searches) {
-      const matches = await searchSongsByKeyword(keyword);
-      for (const song of matches) {
-        const key = `${song.name.toLowerCase()}::${song.artist.toLowerCase()}`;
-        if (!library.has(key)) library.set(key, { ...song, id: `song_${library.size + 1}` });
+  if (Array.isArray(body.searchResults)) {
+    for (const item of body.searchResults) {
+      if (typeof item?.id !== "string" || typeof item?.name !== "string" || typeof item?.artist !== "string") continue;
+      const key = `${item.name.toLowerCase()}::${item.artist.toLowerCase()}`;
+      if (!library.has(key)) {
+        library.set(key, {
+          id: item.id,
+          name: item.name,
+          artist: item.artist,
+          musical_attributes: Array.isArray(item.musical_attributes) ? item.musical_attributes : [],
+          personal_attributes: Array.isArray(item.personal_attributes) ? item.personal_attributes : [],
+        });
       }
     }
-  } catch (error) {
-    console.error("Failed to search saved songs", error);
-    return NextResponse.json({ error: "song_search_failed" }, { status: 500 });
   }
 
   const allowedFunctionNames = searches.length < params.minimumKeywordSearches
@@ -132,12 +135,16 @@ export async function POST(request: Request) {
       try {
         const matches = await searchSongsByKeyword(keyword);
         console.info("AI song library query", { keyword, resultCount: matches.length });
+        for (const song of matches) {
+          const key = `${song.name.toLowerCase()}::${song.artist.toLowerCase()}`;
+          if (!library.has(key)) library.set(key, { ...song, id: `song_${library.size + 1}` });
+        }
       } catch (error) {
         console.error("Failed to search saved songs", error);
         return NextResponse.json({ error: "song_search_failed" }, { status: 500 });
       }
       searches.push(keyword);
-      return NextResponse.json({ searches, done: false });
+      return NextResponse.json({ searches, searchResults: [...library.values()], done: false });
     }
     if (searches.length >= params.maximumKeywordSearches) return NextResponse.json({ searches, done: true });
     return NextResponse.json({ searches, done: false, feedback: "That keyword was empty or already searched. Choose a new, distinct keyword." });

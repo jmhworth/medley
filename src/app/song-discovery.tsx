@@ -13,6 +13,8 @@ type Recommendation = {
   reason: string;
 };
 
+type SearchResult = Recommendation["song"] & { id: string };
+
 export function SongDiscovery({
   onSelectSong,
   onRecommendations,
@@ -42,13 +44,14 @@ export function SongDiscovery({
     try {
       let streamRecommendations: Recommendation[] = [];
       let searches: string[] = [];
+      let searchResults: SearchResult[] = [];
       let feedback = "";
       let done = false;
       for (let step = 0; step < 12 && !done; step += 1) {
         const response = await fetch("/api/songs/discover", {
           method: "POST",
           headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({ prompt: requestedPrompt, seed, searches, recommendations: streamRecommendations, feedback }),
+          body: JSON.stringify({ prompt: requestedPrompt, seed, searches, searchResults, recommendations: streamRecommendations, feedback }),
         });
         const data = await response.json();
         if (!response.ok) {
@@ -61,6 +64,7 @@ export function SongDiscovery({
                 : "Could not find recommendations. Please try again.");
         }
         searches = data.searches ?? searches;
+        searchResults = data.searchResults ?? searchResults;
         feedback = data.feedback ?? "";
         if (data.recommendation) {
           streamRecommendations = [...streamRecommendations, data.recommendation];

@@ -48,3 +48,4 @@ HACKING
 - 2026-11-05: Typed the accumulated search keywords as strings so the discovery route passes Vercel's TypeScript build check.
 - 2026-11-06: Explicitly passed completed saved-song search results into Gemini's context so it can guide subsequent searches and recommendations.
 - 2026-11-06: Returned accumulated saved-song search results to the client and reused them on later steps so each route invocation performs at most one new keyword search.
+- 2026-11-06: Typed transient discovery songs and recommendations without the database-only `user_id` field so the Vercel TypeScript build accepts the route's actual response shape.

@@ -6,8 +6,8 @@ import { getMedleyUser } from "@/lib/supabase/auth";
 
 export const maxDuration = 60;
 
-type ToolSong = Song & { id: string };
-type Recommendation = { song: Song; reason: string };
+type ToolSong = Omit<Song, "user_id"> & { id: string };
+type Recommendation = { song: Omit<Song, "user_id">; reason: string };
 
 const toolDeclarations = [
   {

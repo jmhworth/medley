@@ -2,6 +2,25 @@
 
 > Your music taste, understood over time.
 
+## Deploy to Vercel
+
+Medley is a Next.js App Router app. Import this Git repository into Vercel and keep the detected Next.js framework, install command, and build command (`npm run build`). No custom Vercel build settings or project-local Vercel configuration are required. Add the runtime variables below in **Project Settings → Environment Variables** for Production, then redeploy after changing them.
+
+```dotenv
+SPOTIFY_CLIENT_ID=your_spotify_client_id
+SPOTIFY_REDIRECT_URI=https://YOUR_PRODUCTION_DOMAIN/api/spotify/callback
+GOOGLE_AI_STUDIO_API_KEY=your_google_ai_studio_api_key
+SUPABASE_URL=https://YOUR_SUPABASE_PROJECT_REF.supabase.co
+SUPABASE_PUBLISHABLE_KEY=your_supabase_publishable_key
+SUPABASE_SCHEMA=medley
+```
+
+Replace the uppercase placeholders with your deployed domain and values from Spotify, Google AI Studio, and the active Supabase project. Medley uses Spotify's PKCE flow, so it needs a Spotify Client ID but no Spotify Client Secret. Do not add `SUPABASE_SECRET_KEY`, database URLs, or Supabase access tokens to Vercel; those are not runtime requirements for this app.
+
+Before connecting Spotify, add the exact production callback URL from `SPOTIFY_REDIRECT_URI` to the Spotify app's **Redirect URIs**. Set `SUPABASE_URL` and `SUPABASE_PUBLISHABLE_KEY` to the same project used by Daedalus. The `medley` schema must already be activated, and `medley` must be listed in that project's **Project Settings → Data API → Exposed schemas**. For Supabase email confirmation links, also set the project's Auth **Site URL** to the production origin and allow that origin in the Auth redirect URL settings.
+
+For reliable Spotify OAuth, use a stable production domain and configure the production environment with its callback URL. Vercel preview deployments have distinct hostnames; Spotify requires each redirect URI to be registered exactly, so previews need their own matching environment value and registered callback before Spotify sign-in will work there. Redeploy whenever a Vercel environment variable changes.
+
 ## Local Spotify setup
 
 Set `SPOTIFY_CLIENT_ID`, `SPOTIFY_REDIRECT_URI`, and `GOOGLE_AI_STUDIO_API_KEY` in this project's ignored `.env` file. Register `http://127.0.0.1:3000/api/spotify/callback` as an exact Redirect URI on the same Spotify app, open Medley at `http://127.0.0.1:3000`, and restart the Next.js dev server after changing `.env`. When started through Daedalus, the active project's environment is synchronized into this `.env` file. The dev server allows both `localhost` and `127.0.0.1` so Next's HMR socket continues to work when either loopback name is used. Existing Spotify connections must disconnect and reconnect to grant the new playback permission. Spotify playback may require Premium and an active device.

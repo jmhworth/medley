@@ -9,7 +9,7 @@ Song discovery turns a listener's free-form mood or activity request into up to 
 - **Grounded results**: Search results are rebuilt from the authenticated user's saved songs on each step. The recommendation tool accepts only a song ID found in those results and caps recommendations at three.
 - **Session lifetime**: Recommendations are held in client state and disappear when the page is refreshed.
 - **Stepwise loading**: The client makes one route request per Gemini decision and appends each selected recommendation to the visible list and listening queue while it requests later recommendations.
-- **Context continuity**: Each step includes the original request, any played-song seed, completed search keywords, prior recommendations, and the saved songs found by those searches.
+- **Context continuity**: Each step includes the original request, any played-song seed, completed search keywords, prior recommendations, and explicit saved-song search results so Gemini can choose useful next keywords and recommendations.
 - **Similar discovery**: After starting playback, the user can request similar songs; the played song and its musical and personal attributes seed the same search flow.
 - **Credentials and models**: `GOOGLE_AI_STUDIO_API_KEY` is server-only and configured through the ignored environment file. The sibling parameter file orders Google AI models: Gemini 3.8 Flash, Gemini 3.5 Flash-Lite, then Gemma 4 models. HTTP 503 high-demand responses advance to the next configured model, and the request stops only after the configured model list is exhausted or another non-fallback error occurs.
 - **Provider failures**: Google AI Studio rejection status and a bounded response body are logged in the Next.js server terminal; the discovery panel directs users there for diagnosis.
@@ -46,3 +46,4 @@ HACKING
 - 2026-11-06: Raised the discovery route's Vercel duration limit to 60 seconds to accommodate sequential Gemini tool calls and model fallbacks.
 - 2026-11-05: Split discovery into one Gemini decision per request and carried prompt, search, and recommendation context forward from the client to avoid accumulating tool-call latency in a single invocation.
 - 2026-11-05: Typed the accumulated search keywords as strings so the discovery route passes Vercel's TypeScript build check.
+- 2026-11-06: Explicitly passed completed saved-song search results into Gemini's context so it can guide subsequent searches and recommendations.

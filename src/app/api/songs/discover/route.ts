@@ -72,10 +72,17 @@ export async function POST(request: Request) {
     : searches.length >= params.maximumKeywordSearches || previousRecommendations.length >= params.recommendationLimit
       ? ["recommend_song"]
       : ["search_song_library", "recommend_song"];
+  const searchResults = [...library.values()].map(({ id, name, artist, musical_attributes, personal_attributes }) => ({
+    id,
+    name,
+    artist,
+    musical_attributes,
+    personal_attributes,
+  }));
   const completedWork = [
     `Keywords already searched: ${searches.length ? searches.join(", ") : "none"}.`,
     `Songs already recommended: ${previousRecommendations.length ? previousRecommendations.map(({ song }) => `${song.name} by ${song.artist}`).join("; ") : "none"}.`,
-    `Songs found so far: ${JSON.stringify([...library.values()].map(({ id, name, artist, musical_attributes, personal_attributes }) => ({ id, name, artist, musical_attributes, personal_attributes })))}.`,
+    `Search results from those keywords (use these saved songs to guide the next search or recommendation): ${JSON.stringify(searchResults)}.`,
     typeof body.feedback === "string" ? `The previous step needs correction: ${body.feedback}` : "",
   ].join(" ");
   const userContext = [
@@ -83,7 +90,7 @@ export async function POST(request: Request) {
     `Original request: ${prompt}`,
     seed ? `A song was just played from Medley: ${seed}` : "",
     completedWork,
-    `There are ${library.size} distinct songs from the completed searches available through the tools. Search at least ${params.minimumKeywordSearches} different keywords before recommending, and no more than ${params.maximumKeywordSearches}. Recommend at most one song in this step, only from the tool results, and do not repeat an already recommended song. If there are no fitting songs after the allowed searches, call recommend_song with an empty song_id and explain that no match was found.`,
+    `There are ${library.size} distinct songs from the completed searches available through the tools. Use the search results above to see what the library contains and choose useful new keywords when more searching is needed. Search at least ${params.minimumKeywordSearches} different keywords before recommending, and no more than ${params.maximumKeywordSearches}. Recommend at most one song in this step, only from the tool results, and do not repeat an already recommended song. If there are no fitting songs after the allowed searches, call recommend_song with an empty song_id and explain that no match was found.`,
   ].filter(Boolean).join(" ");
 
   let response: Response | undefined;

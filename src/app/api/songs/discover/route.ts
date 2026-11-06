@@ -1,5 +1,6 @@
 import { NextResponse } from "next/server";
 import { searchSongsByKeyword } from "@/lib/songs/db";
+import { getMusicContext } from "@/lib/songs/music-context";
 import { loadDiscoveryParams } from "@/lib/songs/discovery-params";
 import type { Song } from "@/lib/songs/types";
 import { getMedleyUser } from "@/lib/supabase/auth";
@@ -46,6 +47,12 @@ export async function POST(request: Request) {
   if (!prompt) return NextResponse.json({ error: "prompt_required" }, { status: 400 });
 
   const params = loadDiscoveryParams();
+  let musicContext = "";
+  try {
+    musicContext = await getMusicContext();
+  } catch {
+    // Discovery can still use explicit request and saved-song evidence if context is unavailable.
+  }
   const searches: string[] = Array.isArray(body.searches)
     ? [...new Set<string>(body.searches.filter((item: unknown): item is string => typeof item === "string").map((item: string) => item.trim().toLowerCase()).filter(Boolean))].slice(0, params.maximumKeywordSearches)
     : [];
@@ -91,6 +98,7 @@ export async function POST(request: Request) {
   const userContext = [
     "Recommend one song given this context:",
     `Original request: ${prompt}`,
+    musicContext ? `Known music preferences and recent listener context: ${musicContext}` : "",
     seed ? `A song was just played from Medley: ${seed}` : "",
     completedWork,
     `There are ${library.size} distinct songs from the completed searches available through the tools. Use the search results above to see what the library contains and choose useful new keywords when more searching is needed. Search at least ${params.minimumKeywordSearches} different keywords before recommending, and no more than ${params.maximumKeywordSearches}. Recommend at most one song in this step, only from the tool results, and do not repeat an already recommended song. If there are no fitting songs after the allowed searches, call recommend_song with an empty song_id and explain that no match was found.`,

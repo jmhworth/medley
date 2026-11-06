@@ -12,6 +12,7 @@ Song discovery turns a listener's free-form mood or activity request into up to 
 - **Context continuity**: Each step includes the original request, any played-song seed, completed search keywords, prior recommendations, and saved-song search results retained by the client so Gemini can choose useful next keywords and recommendations without the route repeating earlier database searches.
 - **Recoverable model choices**: Missing tool calls and invalid recommendation IDs keep accumulated search results and ask Gemini to correct its next decision; the panel distinguishes saved-song matches from a genuinely empty search.
 - **Similar discovery**: After starting playback, the user can request similar songs; the played song and its musical and personal attributes seed the same search flow.
+- **Saved listener context**: The discovery route includes the authenticated user's persistent music context when available, allowing known preferences to guide searches; see `feature_files/music_context.md`.
 - **Credentials and models**: `GOOGLE_AI_STUDIO_API_KEY` is server-only and configured through the ignored environment file. The sibling parameter file orders Google AI models: Gemini 3.8 Flash, Gemini 3.5 Flash-Lite, then Gemma 4 models. HTTP 400, 404, 408, 503, and 504 responses and fetch-level failures advance to the next configured model; each attempt, including response-body parsing, has a configurable timeout so a stalled final response cannot consume the route's full duration.
 - **Provider failures**: Google AI Studio rejection status and a bounded response body are logged in the Next.js server terminal; the discovery panel directs users there for diagnosis.
 - **Function duration**: Each Vercel route invocation makes one Gemini decision; the client repeats requests until it reaches the recommendation limit or the model finds no match.
@@ -27,6 +28,7 @@ Song discovery turns a listener's free-form mood or activity request into up to 
 - `parameter_files/song_discovery.toml`: Search limits and ordered Google AI model choices.
 - `daedalus-migrations/202611041930_medley_search_songs.sql`: User-scoped keyword search function.
 - `src/lib/songs/db.ts`: Supabase RPC search helper.
+- `src/lib/songs/music-context.ts`: User-scoped context reader used to add known listening preferences to discovery.
 - `src/lib/spotify/api.ts`: Spotify track resolution and playback API calls.
 - `src/app/page.tsx`: Home page discovery entry; daily collection remains available.
 - `feature_files/song_database.md`: Song data ownership and search relationship.

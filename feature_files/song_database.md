@@ -10,6 +10,7 @@ The song collection system stores each user's musical and personal song attribut
 - **Daily ranking and reflection**: The queue ranks grouped songs by that day's play count and stores date-specific notes separately in `medley.song_moments`; see `feature_files/daily_song_reflection.md`.
 - **Review**: Inputs accept one hyphen-prefixed attribute per line. Existing populated lists are displayed and preserved; empty lists require at least one entry before save. Skip advances any song without saving, including songs the user only sampled.
 - **Persistence**: Save upserts both arrays using the user/name/artist key. Spotify play timestamps are used only to select the day's queue and are not stored.
+- **Feedback learning**: Successful feedback saves from both review surfaces contribute to the persistent music context cadence; context storage and interpretation belong to `feature_files/music_context.md`.
 - **Discovery search**: `medley.search_my_songs` searches song names, credited artists, and both attribute arrays using the caller's authenticated identity and row-level security; see `feature_files/song_discovery.md` for recommendation behavior.
 - **Configuration**: No song-store path or credentials live in `parameter_files/song_database.toml`.
 
@@ -18,6 +19,7 @@ The song collection system stores each user's musical and personal song attribut
 - `src/lib/songs/db.ts`: Supabase lookup and user-scoped upsert helpers.
 - `src/app/api/songs/collection/route.ts`: Loads and deduplicates daily Spotify plays, then joins saved attributes.
 - `src/app/api/songs/save/route.ts`: Authenticated song attribute upsert endpoint.
+- `src/lib/songs/music-context.ts`: Follow-up user context refresh after successful attribute saves.
 - `src/app/song-collection.tsx`: Daily queue and bullet-list review UI.
 - `src/lib/supabase/server.ts`: Cookie-authenticated Supabase client configured for the project schema.
 - `daedalus-migrations/202611041700_medley_create_songs.sql`: `medley.songs`, unique key, grants, and user RLS policies.

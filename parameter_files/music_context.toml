@@ -1,0 +1,8 @@
+# Number of successful song feedback saves between context updates
+feedback_updates_every = 3
+
+# Google AI Studio models tried in order when updating the context
+google_ai_models = ["gemini-3.8-flash", "gemini-3.5-flash-lite"]
+
+# Timeout for each model attempt
+google_ai_request_timeout_ms = 10000

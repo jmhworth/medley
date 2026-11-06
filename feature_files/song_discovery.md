@@ -45,3 +45,4 @@ HACKING
 - 2026-11-05: Streamed discovery recommendations individually so playback can begin while later recommendations continue loading into the queue.
 - 2026-11-06: Raised the discovery route's Vercel duration limit to 60 seconds to accommodate sequential Gemini tool calls and model fallbacks.
 - 2026-11-05: Split discovery into one Gemini decision per request and carried prompt, search, and recommendation context forward from the client to avoid accumulating tool-call latency in a single invocation.
+- 2026-11-05: Typed the accumulated search keywords as strings so the discovery route passes Vercel's TypeScript build check.

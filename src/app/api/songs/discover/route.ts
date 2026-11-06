@@ -46,8 +46,8 @@ export async function POST(request: Request) {
   if (!prompt) return NextResponse.json({ error: "prompt_required" }, { status: 400 });
 
   const params = loadDiscoveryParams();
-  const searches = Array.isArray(body.searches)
-    ? [...new Set(body.searches.filter((item: unknown): item is string => typeof item === "string").map((item: string) => item.trim().toLowerCase()).filter(Boolean))].slice(0, params.maximumKeywordSearches)
+  const searches: string[] = Array.isArray(body.searches)
+    ? [...new Set<string>(body.searches.filter((item: unknown): item is string => typeof item === "string").map((item: string) => item.trim().toLowerCase()).filter(Boolean))].slice(0, params.maximumKeywordSearches)
     : [];
   const previousRecommendations: Recommendation[] = Array.isArray(body.recommendations)
     ? body.recommendations.filter((item: Recommendation) => item?.song?.name && item?.song?.artist).slice(0, params.recommendationLimit)

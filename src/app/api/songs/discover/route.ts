@@ -100,20 +100,26 @@ export async function POST(request: Request) {
   let providerError = "";
   for (const model of params.googleAiModels) {
     const endpoint = `https://generativelanguage.googleapis.com/v1beta/models/${model}:generateContent`;
-    response = await fetch(endpoint, {
-      method: "POST",
-      headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
-      body: JSON.stringify({
-        systemInstruction: { parts: [{ text: "Use the provided tools for all library search and recommendation selection. Make only the next single discovery decision." }] },
-        contents: [{ role: "user", parts: [{ text: userContext }] }],
-        tools: [{ functionDeclarations: toolDeclarations }],
-        toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames } },
-      }),
-      cache: "no-store",
-    });
+    try {
+      response = await fetch(endpoint, {
+        method: "POST",
+        headers: { "Content-Type": "application/json", "x-goog-api-key": apiKey },
+        body: JSON.stringify({
+          systemInstruction: { parts: [{ text: "Use the provided tools for all library search and recommendation selection. Make only the next single discovery decision." }] },
+          contents: [{ role: "user", parts: [{ text: userContext }] }],
+          tools: [{ functionDeclarations: toolDeclarations }],
+          toolConfig: { functionCallingConfig: { mode: "ANY", allowedFunctionNames } },
+        }),
+        cache: "no-store",
+      });
+    } catch (error) {
+      response = undefined;
+      providerError = error instanceof Error ? error.message : String(error);
+      continue;
+    }
     if (response.ok) break;
     providerError = await response.text();
-    if (response.status !== 400 && response.status !== 404 && response.status !== 503) break;
+    if (![400, 404, 408, 503, 504].includes(response.status)) break;
   }
 
   if (!response || !response.ok) {

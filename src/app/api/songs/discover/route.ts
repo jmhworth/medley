@@ -126,7 +126,7 @@ export async function POST(request: Request) {
       });
       if (!response.ok) {
         providerError = await response.text();
-        if ([400, 404, 408, 503, 504].includes(response.status)) continue;
+        if ([400, 404, 408, 429, 503, 504].includes(response.status)) continue;
         break;
       }
       data = await response.json();
